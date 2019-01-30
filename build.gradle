@@ -1,0 +1,59 @@
+buildscript {
+    ext.kotlin_version = kotlinVersion
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+plugins {
+    id 'org.jetbrains.intellij' version "0.3.12"
+}
+
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+//allprojects {
+    apply plugin: 'java'
+    apply plugin: 'kotlin'
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+
+    // sourceSets {
+    //     main {
+    //         java.srcDirs 'src'
+    //         kotlin.srcDirs 'src'
+    //         resources.srcDir 'resources'
+    //     }
+    // }
+
+    dependencies {
+        compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+    }
+
+    apply plugin: 'org.jetbrains.intellij'
+    intellij {
+        version ideaVersion
+        pluginName 'HOCON Converter'
+        updateSinceUntilBuild false
+        publishPlugin {
+            username publishUsername
+            password publishPassword
+        }
+    }
+//}
+
+apply plugin: 'idea'
+idea {
+    project {
+        jdkName = javaVersion
+        languageLevel = javaVersion
+        vcs = 'Git'
+    }
+}

@@ -1,0 +1,59 @@
+<idea-plugin>
+    <id>com.nurflugel</id>
+    <name>HOCON Converter</name>
+    <version>0.0.1</version>
+    <vendor email="dbullard@nurflugel.com" url="http://www.nurflugel.com">Nurflugel.com</vendor>
+    <!--<description><![CDATA[-->
+    <!--Convert between HOCON map form, and HOCON propreties form.<br>-->
+    <!--<em>most HTML tags may be used</em>-->
+    <!--]]></description>-->
+
+    <depends>com.intellij.modules.lang</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+    </extensions>
+
+    <actions>
+        <group>
+            <action id="hocon.convertToProperty"
+                    class="com.nurflugel.hocon.HoconConvertToConfAction"
+                    text="HOCON - Map -> Properties"
+
+                    description="Convert from sort of YAML to sort of properties">
+                <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt shift p"/>
+            </action>
+            <action id="hocon.convertToConf"
+                    class="com.nurflugel.hocon.HoconConvertToPropertiesAction"
+                    text="HOCON - Properties -> Map"
+                    description="Convert from sort of properties to sort of YAML">
+                <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt shift c"/>
+            </action>
+            <add-to-group group-id="EditMenu" anchor="last"/>
+        </group>
+    </actions>
+</idea-plugin>
+
+        <!--<idea-plugin>-->
+        <!--<id>com.nurflugel.hoconplugin</id>-->
+        <!--<name>Plugin display name here</name>-->
+        <!--<vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>-->
+
+        <!--<description><![CDATA[-->
+        <!--Enter short description for your plugin here.<br>-->
+        <!--<em>most HTML tags may be used</em>-->
+        <!--]]></description>-->
+
+        <!--&lt;!&ndash; please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html-->
+        <!--on how to target different products &ndash;&gt;-->
+        <!--&lt;!&ndash; uncomment to enable plugin in all products-->
+        <!--<depends>com.intellij.modules.lang</depends>-->
+        <!--&ndash;&gt;-->
+
+        <!--<extensions defaultExtensionNs="com.intellij">-->
+        <!--&lt;!&ndash; Add your extensions here &ndash;&gt;-->
+        <!--</extensions>-->
+
+        <!--<actions>-->
+        <!--&lt;!&ndash; Add your actions here &ndash;&gt;-->
+        <!--</actions>-->
+        <!--</idea-plugin>-->
