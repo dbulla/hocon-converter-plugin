@@ -127,7 +127,7 @@ class FileUtil {
         }
 
 
-        private fun convertPropertiesToConf(existingLines: List<String>): MutableList<String> {
+        fun convertPropertiesToConf(existingLines: List<String>): MutableList<String> {
             val propsMap: MutableMap<String, Any> = populatePropsMap(existingLines)
             return generateConfOutput(propsMap)
         }
@@ -153,7 +153,7 @@ class FileUtil {
             for (key in sortedKeys) {
                 val value = propsMap[key]
                 // is the value a map, or a key
-                val whiteSpace = StringUtils.repeat("\t", indentLevel)
+                val whiteSpace = StringUtils.repeat("  ", indentLevel)
                 if (value is Map<*, *>) {// increase the indent level
                     indentLevel++
                     lines.add("$whiteSpace$key {")
@@ -165,7 +165,7 @@ class FileUtil {
                 }
             }
             indentLevel--
-            val whiteSpace = StringUtils.repeat("\t", indentLevel)
+            val whiteSpace = StringUtils.repeat("  ", indentLevel)
             lines.add("$whiteSpace}")
             return indentLevel
         }
@@ -247,7 +247,7 @@ class FileUtil {
         auth.okta.url = "https://auth-qa.nike.net/auth"
 
          */
-        private fun convertConfToProperties(lines: List<String>): MutableList<String> {
+        fun convertConfToProperties(lines: List<String>): MutableList<String> {
             val map = mutableMapOf<String, Any>()
             val keyStack = Stack<String>()
             val outputLines = mutableListOf<String>()
