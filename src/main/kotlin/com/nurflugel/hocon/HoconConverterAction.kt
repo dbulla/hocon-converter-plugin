@@ -267,7 +267,12 @@ class FileUtil {
             return outputLines
         }
 
-        private fun processLine(line: String, map: MutableMap<String, Any>, keyStack: Stack<String>, outputLines: MutableList<String>) {
+        private fun processLine(
+            line: String,
+            map: MutableMap<String, Any>,
+            keyStack: Stack<String>,
+            outputLines: MutableList<String>
+        ) {
             println("line = ${line}")
             when {
                 !line.contains("=") && line.contains("{") -> { // we're adding another level to the stack, but not if the { is inside quotes
