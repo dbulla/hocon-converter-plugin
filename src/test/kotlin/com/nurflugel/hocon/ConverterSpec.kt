@@ -8,13 +8,7 @@ import io.kotlintest.specs.StringSpec
 Test cases:
 
 
- * aaaa {
- *    bbbb = 5
- *    cccc = "text"
- *    dddd = true
- * }
- * 
- * 
+ *
  * cors = [
  *    "some url"
  *    "another URL"
@@ -55,27 +49,42 @@ Test cases:
  *  
  *  also - auto quote wrapping
  */
-class ConverterSpec : StringSpec({
+class ConverterSpec : StringSpec(
+    {
 
-    "properties format simple keys" {
-        val lines = arrayListOf("""one="kkkk""", "two.three.four = 5")
-        val confLines = FileUtil.convertPropertiesToConf(lines)
+        "properties format simple keys" {
+            val lines = arrayListOf("""one="kkkk""", "two.three.four = 5")
+            val confLines = FileUtil.convertPropertiesToConf(lines)
 
 
-        val expectedLines = arrayListOf(
-            """one = "kkkk""",
-            "two {",
-            "  three {",
-            "    four = 5",
-            "  }",
-            "}"
-        )
-        confLines shouldBe expectedLines
-    }
+            val expectedLines = arrayListOf(
+                """one = "kkkk""",
+                "two {",
+                "  three {",
+                "    four = 5",
+                "  }",
+                "}"
+            )
+            confLines shouldBe expectedLines
+        }
 
-    "conf format simple keys" {
-        val lines = arrayListOf("""one = "kkkk""", "two.three.four = 5")
-        val propertyLines = FileUtil.convertConfToProperties(lines)
-        propertyLines shouldBe lines
-    }
-})
+        "conf format simple keys" {
+            val lines = arrayListOf("""one = "kkkk""", "two.three.four = 5")
+            val propertyLines = FileUtil.convertConfToProperties(lines)
+            propertyLines shouldBe lines
+        }
+
+//                                     * aaaa {
+//                                     *    bbbb = 5
+//                                     *    cccc = "text"
+//                                     *    dddd = true
+//                                     * }
+//                                     *
+
+        "conf format with map of keys"{
+            val lines = arrayListOf("aaaa {", "   bbbb = 5", "   cccc = \"text\"", "   dddd = true", "}")
+            val propertyLines = FileUtil.convertConfToProperties(lines)
+            val expectedLines = arrayListOf("aaaa.bbbb = 5", "aaaa.cccc = \"text\"", "aaaa.dddd = true")
+            propertyLines shouldBe expectedLines
+        }
+    })
