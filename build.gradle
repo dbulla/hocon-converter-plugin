@@ -12,27 +12,17 @@ buildscript {
 
 plugins {
     id 'org.jetbrains.intellij' version "0.3.12"
+    id "com.github.ben-manes.versions" version "0.20.0" 
 }
 
 repositories {
     jcenter()
     mavenCentral()
 }
-
-//allprojects {
 apply plugin: 'java'
 apply plugin: 'kotlin'
 sourceCompatibility = javaVersion
 targetCompatibility = javaVersion
-
-// sourceSets {
-//     main {
-//         java.srcDirs 'src'
-//         kotlin.srcDirs 'src'
-//         resources.srcDir 'resources'
-//     }
-// }
-
 
 test {
     useJUnitPlatform()
@@ -53,7 +43,6 @@ intellij {
         password publishPassword
     }
 }
-//}
 
 apply plugin: 'idea'
 idea {
