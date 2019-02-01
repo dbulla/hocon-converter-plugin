@@ -87,4 +87,13 @@ class ConverterSpec : StringSpec(
             val expectedLines = arrayListOf("aaaa.bbbb = 5", "aaaa.cccc = \"text\"", "aaaa.dddd = true")
             propertyLines shouldBe expectedLines
         }
+
+        "single mapped key should be as property"{
+            val lines = arrayListOf("aaaa {", "   bbbb{", "   cccc {", "       dddd = true", "}", "}", "}")
+            val propertyLines = FileUtil.convertConfToProperties(lines)
+            val confLines = FileUtil.convertPropertiesToConf(propertyLines)
+            val expectedLines = arrayListOf("aaaa.bbb.cccc.dddd = true")
+            confLines shouldBe expectedLines
+        }
+        
     })
