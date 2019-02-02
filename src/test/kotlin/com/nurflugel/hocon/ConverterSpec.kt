@@ -1,9 +1,9 @@
 package com.nurflugel.hocon
 
-import com.nurflugel.hocon.FileUtil.Companion.convertConfToProperties
-import com.nurflugel.hocon.FileUtil.Companion.convertPropertiesToConf
-import com.nurflugel.hocon.FileUtil.Companion.createParsingMap
-import com.nurflugel.hocon.FileUtil.Companion.isSingleKeyValue
+import com.nurflugel.hocon.parsers.ConfToPropertyParser.Companion.convertConfToProperties
+import com.nurflugel.hocon.parsers.ConfToPropertyParser.Companion.createParsingMap
+import com.nurflugel.hocon.parsers.PropertiesToConfParser.Companion.convertPropertiesToConf
+import com.nurflugel.hocon.parsers.PropertiesToConfParser.Companion.isSingleKeyValue
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
 import java.util.*
@@ -122,20 +122,20 @@ class ConverterSpec : StringSpec(
     "is single key value 1".config(enabled = false) {
       val lines = arrayListOf("aa.bb.cc.dd=f")
       val map = createParsingMap(lines, Stack(), mutableListOf())
-      val result = isSingleKeyValue(map)
+      val result = isSingleKeyValue(map.map)
       result shouldBe true
     }
 
-    "is single deeper key value 1"{
+    "is single deeper key value 1" {
       val lines = arrayListOf("aaa.bb.ee=ff", "aa.bb.cc.dd=f")
       val map = createParsingMap(lines, Stack(), mutableListOf())
-      val result = isSingleKeyValue(map)
+      val result = isSingleKeyValue(map.map)
       result shouldBe false
     }
 
 
     //todo write test for 'include xxxxxx'
-    "don't lose the includes".config(enabled = false) {
+    "don't lose the includes in map formatter" {
       val lines = """
         include "reference2.conf"
         include "reference1.conf"
@@ -144,11 +144,24 @@ class ConverterSpec : StringSpec(
         aa.bb.cc.dd="f"
         """.trimIndent().split("\n")
       val confLines = convertPropertiesToConf(lines)
-      val propertyLines = convertConfToProperties(lines)
       // ensure order is preserved, as well as the includes just being there
       confLines[0] shouldBe """include "reference2.conf""""
       confLines[1] shouldBe """include "reference1.conf""""
-      // same with hte other conversion
+
+    }
+
+    //todo write test for 'include xxxxxx'
+    "don't lose the includes in property formatter" {
+      val lines = """
+        include "reference2.conf"
+        include "reference1.conf"
+
+        aaa.bb.ee="ff"
+        aa.bb.cc.dd="f"
+        """.trimIndent().split("\n")
+      val propertyLines = convertConfToProperties(lines)
+
+      // same with the other conversion
       propertyLines[0] shouldBe """include "reference2.conf""""
       propertyLines[1] shouldBe """include "reference1.conf""""
     }
