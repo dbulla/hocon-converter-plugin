@@ -1,7 +1,12 @@
 package com.nurflugel.hocon
 
+import com.nurflugel.hocon.FileUtil.Companion.convertConfToProperties
+import com.nurflugel.hocon.FileUtil.Companion.convertPropertiesToConf
+import com.nurflugel.hocon.FileUtil.Companion.createParsingMap
+import com.nurflugel.hocon.FileUtil.Companion.isSingleKeyValue
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
+import java.util.*
 
 /*
 
@@ -50,50 +55,101 @@ Test cases:
  *  also - auto quote wrapping
  */
 class ConverterSpec : StringSpec(
-    {
+  {
 
-        "properties format simple keys" {
-            val lines = arrayListOf("""one="kkkk""", "two.three.four = 5")
-            val confLines = FileUtil.convertPropertiesToConf(lines)
+    "properties format simple keys" {
+      val lines = """
+        one="kkkk"
+        two.three.four = 5
+        """.trimIndent().split("\n")
+      val confLines = convertPropertiesToConf(lines)
 
 
-            val expectedLines = arrayListOf(
-                """one = "kkkk""",
-                "two {",
-                "  three {",
-                "    four = 5",
-                "  }",
-                "}"
-            )
-            confLines shouldBe expectedLines
+      val expectedLines = """
+          one = "kkkk"
+          two {
+            three {
+              four = 5
+            }
+          }
+""".trimIndent().split("\n")
+
+      confLines shouldBe expectedLines
+    }
+
+    "conf format simple keys" {
+      val lines = """
+        one = "kkkk"
+        two.three.four = 5
+        """.trimIndent().split("\n")
+      val propertyLines = convertConfToProperties(lines)
+      propertyLines shouldBe lines
+    }
+
+    "conf format with map of keys"{
+      val lines = """
+        aaaa {
+        bbbb = 5
+        cccc = "text"
+        dddd = true
         }
+""".trimIndent().split("\n")
+      val propertyLines = convertConfToProperties(lines)
+      val expectedLines = """
+        aaaa.bbbb = 5
+        aaaa.cccc = "text"
+        aaaa.dddd = true
+""".trimIndent().split("\n")
+      propertyLines shouldBe expectedLines
+    }
 
-        "conf format simple keys" {
-            val lines = arrayListOf("""one = "kkkk""", "two.three.four = 5")
-            val propertyLines = FileUtil.convertConfToProperties(lines)
-            propertyLines shouldBe lines
+    "single mapped key should be as property".config(enabled = false) {
+      val lines = """
+        aaaa {
+           bbbb{
+              cccc {
+                 dddd = true
+              }
+           },
         }
+        """.trimIndent().split("\n")
+      val propertyLines = convertConfToProperties(lines)
+      val confLines = convertPropertiesToConf(propertyLines)
+      val expectedLines = arrayListOf("aaaa.bbb.cccc.dddd = true")
+      confLines shouldBe expectedLines
+    }
 
-//                                     * aaaa {
-//                                     *    bbbb = 5
-//                                     *    cccc = "text"
-//                                     *    dddd = true
-//                                     * }
-//                                     *
+    "is single key value 1".config(enabled = false) {
+      val lines = arrayListOf("aa.bb.cc.dd=f")
+      val map = createParsingMap(lines, Stack(), mutableListOf())
+      val result = isSingleKeyValue(map)
+      result shouldBe true
+    }
 
-        "conf format with map of keys"{
-            val lines = arrayListOf("aaaa {", "   bbbb = 5", "   cccc = \"text\"", "   dddd = true", "}")
-            val propertyLines = FileUtil.convertConfToProperties(lines)
-            val expectedLines = arrayListOf("aaaa.bbbb = 5", "aaaa.cccc = \"text\"", "aaaa.dddd = true")
-            propertyLines shouldBe expectedLines
-        }
+    "is single deeper key value 1"{
+      val lines = arrayListOf("aaa.bb.ee=ff", "aa.bb.cc.dd=f")
+      val map = createParsingMap(lines, Stack(), mutableListOf())
+      val result = isSingleKeyValue(map)
+      result shouldBe false
+    }
 
-        "single mapped key should be as property"{
-            val lines = arrayListOf("aaaa {", "   bbbb{", "   cccc {", "       dddd = true", "}", "}", "}")
-            val propertyLines = FileUtil.convertConfToProperties(lines)
-            val confLines = FileUtil.convertPropertiesToConf(propertyLines)
-            val expectedLines = arrayListOf("aaaa.bbb.cccc.dddd = true")
-            confLines shouldBe expectedLines
-        }
-        
-    })
+
+    //todo write test for 'include xxxxxx'
+    "don't lose the includes".config(enabled = false) {
+      val lines = """
+        include "reference2.conf"
+        include "reference1.conf"
+
+        aaa.bb.ee="ff"
+        aa.bb.cc.dd="f"
+        """.trimIndent().split("\n")
+      val confLines = convertPropertiesToConf(lines)
+      val propertyLines = convertConfToProperties(lines)
+      // ensure order is preserved, as well as the includes just being there
+      confLines[0] shouldBe """include "reference2.conf""""
+      confLines[1] shouldBe """include "reference1.conf""""
+      // same with hte other conversion
+      propertyLines[0] shouldBe """include "reference2.conf""""
+      propertyLines[1] shouldBe """include "reference1.conf""""
+    }
+  })
