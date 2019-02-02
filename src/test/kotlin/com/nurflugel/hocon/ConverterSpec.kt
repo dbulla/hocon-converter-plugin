@@ -143,11 +143,11 @@ class ConverterSpec : StringSpec(
         aaa.bb.ee="ff"
         aa.bb.cc.dd="f"
         """.trimIndent().split("\n")
-      val confLines = convertPropertiesToConf(lines)
+      val outputLines = convertPropertiesToConf(lines)
       // ensure order is preserved, as well as the includes just being there
-      confLines[0] shouldBe """include "reference2.conf""""
-      confLines[1] shouldBe """include "reference1.conf""""
-
+      outputLines[0] shouldBe """include "reference2.conf""""
+      outputLines[1] shouldBe """include "reference1.conf""""
+      outputLines[2] shouldBe ""
     }
 
     //todo write test for 'include xxxxxx'
@@ -159,10 +159,11 @@ class ConverterSpec : StringSpec(
         aaa.bb.ee="ff"
         aa.bb.cc.dd="f"
         """.trimIndent().split("\n")
-      val propertyLines = convertConfToProperties(lines)
+      val outputLines = convertConfToProperties(lines)
 
       // same with the other conversion
-      propertyLines[0] shouldBe """include "reference2.conf""""
-      propertyLines[1] shouldBe """include "reference1.conf""""
+      outputLines[0] shouldBe """include "reference2.conf""""
+      outputLines[1] shouldBe """include "reference1.conf""""
+      outputLines[2] shouldBe ""
     }
   })

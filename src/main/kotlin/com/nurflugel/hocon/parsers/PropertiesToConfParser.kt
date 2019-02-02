@@ -24,6 +24,7 @@ class PropertiesToConfParser {
       val lines = mutableListOf<String>()
       // add the includes
       propsMap.includesList.forEach { lines.add(it) }
+      if (propsMap.includesList.isNotEmpty()) lines.add("")
 
       // add the properties
       outputMap(propsMap.map, 0, lines)

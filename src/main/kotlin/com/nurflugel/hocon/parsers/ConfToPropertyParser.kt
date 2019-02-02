@@ -84,15 +84,19 @@ class ConfToPropertyParser {
       val propertiesMap = createParsingMap(lines, keyStack, outputLines)
 
       outputLines.sort()
+      val finalLines = mutableListOf<String>()
 
       // add the includes first
       propertiesMap.includesList
-        .asReversed()
         .forEach {
-          outputLines.add(0, it)
+          finalLines.add(it)
         }
+
+      // a blank line after the includes
+      if (propertiesMap.includesList.isNotEmpty()) finalLines.add("")
+      finalLines.addAll(outputLines)
       // now output the map into property format
-      return outputLines
+      return finalLines
     }
 
     fun createParsingMap(existingLines: List<String>, keyStack: Stack<String>, outputLines: MutableList<String>): PropertiesMap {
