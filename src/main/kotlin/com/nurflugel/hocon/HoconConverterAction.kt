@@ -30,7 +30,35 @@ class HoconConvertToConfAction : TextComponentEditorAction(HoconConvertToConfHan
 
 class FileUtil {
   companion object {
+    /**
+     * dgbtodo ugly, think of a better way to pass the logic
+     * @param isToProperties if true, we're going from conf to properties.  If false, from properties to conf
+     *
+     */
     fun processLines(editor: Editor, isToProperties: Boolean) {
+      val triple = extractText(editor)
+      val doc = triple.first
+      val startLine: Int = triple.second
+      val endLine: Int = triple.third
+
+      if (startLine >= endLine) {
+        return
+      }
+
+      // Extract text as a list of lines
+      val lines = extractLines(doc, startLine, endLine)
+
+      // Convert to the new format
+      val newLines: List<String> = when {
+        isToProperties -> convertPropertiesToConf(lines)
+        else -> convertConfToProperties(lines)
+      }
+
+      // Stick it back into the document
+      replaceTextInDocument(newLines, doc, startLine, endLine, editor)
+    }
+
+    private fun extractText(editor: Editor): Triple<Document, Int, Int> {
       val doc = editor.document
 
       val startLine: Int
@@ -52,16 +80,10 @@ class FileUtil {
 
       // Ignore last lines (usually one) which are only '\n'
       endLine = ignoreLastEmptyLines(doc, endLine)
+      return Triple(doc, startLine, endLine)
+    }
 
-      if (startLine >= endLine) {
-        return
-      }
-
-      // Extract text as a list of lines
-      val lines = extractLines(doc, startLine, endLine)
-
-      val newLines: List<String> = doConversion(lines, isToProperties)
-
+    private fun replaceTextInDocument(newLines: List<String>, doc: Document, startLine: Int, endLine: Int, editor: Editor) {
       val convertedText = joinLines(newLines)
 
       // Replace text
@@ -102,13 +124,6 @@ class FileUtil {
       }
 
       return builder
-    }
-
-    private fun doConversion(lines: List<String>, toProperties: Boolean): List<String> {
-      return when {// todo replace with method references
-        toProperties -> convertPropertiesToConf(lines)
-        else -> convertConfToProperties(lines)
-      }
     }
 
     private fun ignoreLastEmptyLines(doc: Document, endLine: Int): Int {
