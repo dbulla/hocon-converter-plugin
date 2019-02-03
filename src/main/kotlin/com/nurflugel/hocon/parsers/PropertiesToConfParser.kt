@@ -143,9 +143,38 @@ class PropertiesToConfParser {
         .filter { !it.startsWith("//") }//only process lines with '=' in them
         .map { StringUtils.substringBefore(it, "=").trim() to StringUtils.substringAfter(it, "=").trim() }
         .toList()
-        .forEach { ConfToPropertyParser.addToPropsMap(it, propsMap) }
+        .forEach { addToPropsMap(it, propsMap) }
 
       return propsMap
     }
+
+    // take the pair and add it to the properties map
+    private fun addToPropsMap(keyValue: Pair<String, String>, propsMap: PropertiesMap) {
+      // the key path may be services.cpd.connection.retry, and the value might be 'true'
+      val keyPath: List<String> = keyValue.first.split(".")
+
+      var subMap: MutableMap<String, Any> = propsMap.map
+      // if the map doesn't contain all the folders, create them
+      (0 until keyPath.size - 1)
+        .asSequence()
+        .map { keyPath[it] }
+        .forEach { subMap = getSubMap(subMap, it) }
+      // now subMap is the lowest folder, just need to add the key
+      subMap[keyPath.last()] = keyValue.second
+    }
+
+    private fun getSubMap(propsMap: MutableMap<String, Any>, folderName: String): MutableMap<String, Any> {
+      if (!propsMap.containsKey(folderName)) {
+        val map = mutableMapOf<String, Any>()
+        propsMap[folderName] = map
+        return map
+      }
+      if (propsMap[folderName] is String) {
+        println("""Expected a folder, but found a key for "$folderName"""")
+      }
+      return propsMap[folderName] as MutableMap<String, Any>
+    }
+
   }
+
 }
