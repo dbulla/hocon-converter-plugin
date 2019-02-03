@@ -4,10 +4,13 @@ import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.math.NumberUtils
 
+
 class PropertiesToConfParser {
   companion object {
 
-
+    /** this assumes the lines being parsed are pure property lines - just
+     * stuff like aaa.bbb.ccc.dd=true, no maps
+     */
     fun convertPropertiesToConf(existingLines: List<String>): MutableList<String> {
       val propsMap: PropertiesMap = populatePropsMap(existingLines)
       return generateConfOutput(propsMap)
