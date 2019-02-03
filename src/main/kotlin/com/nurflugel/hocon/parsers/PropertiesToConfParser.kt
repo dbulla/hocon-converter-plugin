@@ -30,7 +30,8 @@ class PropertiesToConfParser {
       outputMap(propsMap.map, 0, lines, true)
 
       // trim the last extra }
-      return lines.subList(0, lines.size - 1)
+//      return lines.subList(0, lines.size - 1)
+      return lines
     }
 
     /** Output the map into conf format */
@@ -65,13 +66,14 @@ class PropertiesToConfParser {
       }
 
       indentLevel--
-      val whiteSpace = StringUtils.repeat("  ", indentLevel)
-//todo this adds an extra "}" at the end of processing - why?
-      lines.add("$whiteSpace}")
-
+      if (indentLevel >= 0) {
+        val whiteSpace = StringUtils.repeat("  ", indentLevel)
+        lines.add("$whiteSpace}")
+      }
+//      else {
 //      if (addBlankLineAfterKey)
 //        lines.add("")
-
+//      }
       return indentLevel
     }
 

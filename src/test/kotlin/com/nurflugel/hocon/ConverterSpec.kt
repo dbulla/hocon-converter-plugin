@@ -57,7 +57,23 @@ Test cases:
 class ConverterSpec : StringSpec(
   {
 
-    "properties format simple keys map".config(enabled = false) {
+
+    "properties format simple keys map 1".config(enabled = ALL_TESTS_ENABLED) {
+      val lines = """
+        bbb.three = 5
+        """.trimIndent().split("\n")
+      val confLines = convertPropertiesToConf(lines)
+      val expectedLines = """
+          bbb {
+            three = 5
+          }
+""".trimIndent().split("\n")
+
+      confLines shouldBe expectedLines
+
+
+    }
+    "properties format simple keys map 2".config(enabled = ALL_TESTS_ENABLED) {
       val lines = """
         aaa="kkkk"
         bbb.three = 5
@@ -71,16 +87,14 @@ class ConverterSpec : StringSpec(
           bbb {
             three = 5
           }
-
           ccc {
             five = 6
           }
-
 """.trimIndent().split("\n")
 
       confLines shouldBe expectedLines
     }
-    "properties format simple keys" {
+    "properties format simple keys".config(enabled = ALL_TESTS_ENABLED) {
       val lines = """
         one="kkkk"
         two.three.four = 5
@@ -100,7 +114,7 @@ class ConverterSpec : StringSpec(
       confLines shouldBe expectedLines
     }
 
-    "conf format simple keys" {
+    "conf format simple keys".config(enabled = ALL_TESTS_ENABLED) {
       val lines = """
         one = "kkkk"
         two.three.four = 5
@@ -109,7 +123,7 @@ class ConverterSpec : StringSpec(
       propertyLines shouldBe lines
     }
 
-    "conf format with map of keys"{
+    "conf format with map of keys".config(enabled = ALL_TESTS_ENABLED) {
       val lines = """
         aaaa {
         bbbb = 5
@@ -126,7 +140,7 @@ class ConverterSpec : StringSpec(
       propertyLines shouldBe expectedLines
     }
 
-    "single mapped key should be as property".config(enabled = false) {
+    "single mapped key should be as property".config(enabled = ALL_TESTS_ENABLED) {
       val lines = """
         aaaa {
            bbbb{
@@ -142,14 +156,14 @@ class ConverterSpec : StringSpec(
       confLines shouldBe expectedLines
     }
 
-    "is single key value 1".config(enabled = false) {
+    "is single key value 1".config(enabled = ALL_TESTS_ENABLED) {
       val lines = arrayListOf("aa.bb.cc.dd=f")
       val map = createParsingMap(lines, Stack(), mutableListOf())
       val result = isSingleKeyValue(map.map)
       result shouldBe true
     }
 
-    "is single deeper key value 1" {
+    "is single deeper key value 1".config(enabled = ALL_TESTS_ENABLED) {
       val lines = arrayListOf("aaa.bb.ee=ff", "aa.bb.cc.dd=f")
       val map = createParsingMap(lines, Stack(), mutableListOf())
       val result = isSingleKeyValue(map.map)
@@ -158,7 +172,7 @@ class ConverterSpec : StringSpec(
 
 
     //todo write test for 'include xxxxxx'
-    "don't lose the includes in map formatter" {
+    "don't lose the includes in map formatter".config(enabled = ALL_TESTS_ENABLED) {
       val lines = """
         include "reference2.conf"
         include "reference1.conf"
@@ -173,8 +187,7 @@ class ConverterSpec : StringSpec(
       outputLines[2] shouldBe ""
     }
 
-    //todo write test for 'include xxxxxx'
-    "don't lose the includes in property formatter" {
+    "don't lose the includes in property formatter".config(enabled = ALL_TESTS_ENABLED) {
       val lines = """
         include "reference2.conf"
         include "reference1.conf"
@@ -189,4 +202,9 @@ class ConverterSpec : StringSpec(
       outputLines[1] shouldBe """include "reference1.conf""""
       outputLines[2] shouldBe ""
     }
-  })
+  }) {
+  companion object {
+    const val ALL_TESTS_ENABLED = true
+//    const val ALL_TESTS_ENABLED=false
+  }
+}
