@@ -25,7 +25,8 @@ class PropertiesToConfParser {
      * */
     private fun generateConfOutput(propsMap: PropertiesMap): MutableList<String> {
       val lines = mutableListOf<String>()
-      // add the includes
+
+      // add any includes first
       propsMap.includesList.forEach { lines.add(it) }
       if (propsMap.includesList.isNotEmpty()) lines.add("")
 
@@ -117,9 +118,11 @@ class PropertiesToConfParser {
         BooleanUtils.toBooleanObject(textValue) != null -> textValue
         // It's a String
         else -> {
-          var textValue1 = textValue
-          if (!textValue1.startsWith('"')) textValue1 = """"$textValue1""""
-          textValue1
+          var result = textValue
+
+          // wrap in quotes unless it's a list
+          if (!result.contains('[') && !result.startsWith('"')) result = """"$result""""
+          result
         }
       }
     }
@@ -137,10 +140,10 @@ class PropertiesToConfParser {
       existingLines
         .asSequence()
         .map { it.trim() }
-        .filter { StringUtils.isNotEmpty(it) }
+        .filter { StringUtils.isNotEmpty(it) } // remove whitespace
+        .filter { !it.startsWith('#') } // skip comments
+        .filter { !it.startsWith("//") }// skip comments
         .filter { it.contains('=') }//only process lines with '=' in them
-        .filter { !it.startsWith('#') }//only process lines with '=' in them
-        .filter { !it.startsWith("//") }//only process lines with '=' in them
         .map { StringUtils.substringBefore(it, "=").trim() to StringUtils.substringAfter(it, "=").trim() }
         .toList()
         .forEach { addToPropsMap(it, propsMap) }
