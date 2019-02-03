@@ -29,8 +29,11 @@ class PropertiesToConfParser {
       // add the properties transformed into map format
       outputMap(propsMap.map, 0, lines, true)
 
-      // trim the last extra }
-//      return lines.subList(0, lines.size - 1)
+      // trim the last blank line if there is one
+      if (lines.last().isBlank()) {
+        lines.removeAt(lines.size - 1)
+        //      return lines.subList(0, lines.size - 1)
+      }
       return lines
     }
 
@@ -70,10 +73,10 @@ class PropertiesToConfParser {
         val whiteSpace = StringUtils.repeat("  ", indentLevel)
         lines.add("$whiteSpace}")
       }
-//      else {
+      if (indentLevel == 0) {
 //      if (addBlankLineAfterKey)
-//        lines.add("")
-//      }
+        lines.add("")
+      }
       return indentLevel
     }
 

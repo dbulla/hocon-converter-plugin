@@ -129,31 +129,39 @@ class ConfToPropertyParser {
       println("line = $line")
       when {
         line.startsWith("include") -> map.addInclude(line)
-        !line.contains("=") && line.contains("{") -> { // we're adding another level to the stack, but not if the { is inside quotes
-          val keyName = StringUtils.substringBefore(line, "{").trim()
-          keyStack.push(keyName)
-        }
+        // we're adding another level to the stack, but not if the { is inside quotes
+        !line.contains("=") && line.contains("{") -> addLevelToKeyStack(line, keyStack)
         // clear last item on stack
         !line.contains("=") && line.contains("}") -> keyStack.pop()
-        else -> {// it's a property
-          val pair: List<String> = line.split("=")
-          if (pair.size == 2) {
-            val key = pair[0].trim()
-            val value = pair[1].trim()
-//            map[key] = value
-//            val prefix = keyStack
-//              .joinToString { "." }
-            val prefix = keyStack.stream()
-              .collect(Collectors.joining("."))
-            val fullKey = when {
-              StringUtils.isEmpty(prefix) -> key
-              else -> "$prefix.$key"
-            }
-            val fullLine = "$fullKey = $value"
-            outputLines.add(fullLine)
-          }
-        }
+        else -> processProperty(line, keyStack, outputLines, map)
       }
+    }
+
+    private fun processProperty(line: String, keyStack: Stack<String>, outputLines: MutableList<String>, map: PropertiesMap) {
+      // it's a property
+      val pair: List<String> = line.split("=")
+      if (pair.size == 2) {
+        val key = pair[0].trim()
+        val value = pair[1].trim()
+        //            map[key] = value
+        //            val prefix = keyStack
+        //              .joinToString { "." }
+        val prefix = keyStack.stream()
+          .collect(Collectors.joining("."))
+        val fullKey = when {
+          StringUtils.isEmpty(prefix) -> key
+          else -> "$prefix.$key"
+        }
+        val fullLine = "$fullKey = $value"
+
+        outputLines.add(fullLine)
+//dgbtodo        map.map[fullKey]=value
+      }
+    }
+
+    private fun addLevelToKeyStack(line: String, keyStack: Stack<String>) {
+      val keyName = StringUtils.substringBefore(line, "{").trim()
+      keyStack.push(keyName)
     }
   }
 }
