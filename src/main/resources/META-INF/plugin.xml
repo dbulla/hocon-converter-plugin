@@ -2,11 +2,11 @@
     <id>com.nurflugel</id>
     <name>HOCON Converter</name>
     <version>0.0.1</version>
-    <vendor email="dbullard@nurflugel.com" url="http://www.nurflugel.com">Nurflugel.com</vendor>
-    <!--<description><![CDATA[-->
-    <!--Convert between HOCON map form, and HOCON propreties form.<br>-->
-    <!--<em>most HTML tags may be used</em>-->
-    <!--]]></description>-->
+    <vendor email="dbullard@nurflugel.com" url="https://github.com/dbulla/hocon-converter-plugin">Nurflugel.com</vendor>
+    <description><![CDATA[
+    Convert between HOCON map form, and HOCON propreties form.<br>
+    <em>most HTML tags may be used</em>
+    ]]></description>
 
     <depends>com.intellij.modules.lang</depends>
 

@@ -71,25 +71,6 @@ class FileUtil {
       editor.document.replaceString(startOffset, endOffset, convertedText)
     }
 
-    private fun doConversion(lines: List<String>, toProperties: Boolean): List<String> {
-      return when {// todo replace with method references
-        toProperties -> convertPropertiesToConf(lines)
-        else -> convertConfToProperties(lines)
-      }
-    }
-
-    private fun ignoreLastEmptyLines(doc: Document, endLine: Int): Int {
-      var mutableEndLine = endLine
-      while (mutableEndLine >= 0) {
-        if (doc.getLineEndOffset(mutableEndLine) > doc.getLineStartOffset(mutableEndLine)) {
-          return mutableEndLine
-        }
-
-        mutableEndLine--
-      }
-
-      return -1
-    }
 
     private fun extractLines(doc: Document, startLine: Int, endLine: Int): List<String> {
       return (startLine..endLine)
@@ -122,6 +103,27 @@ class FileUtil {
 
       return builder
     }
+
+    private fun doConversion(lines: List<String>, toProperties: Boolean): List<String> {
+      return when {// todo replace with method references
+        toProperties -> convertPropertiesToConf(lines)
+        else -> convertConfToProperties(lines)
+      }
+    }
+
+    private fun ignoreLastEmptyLines(doc: Document, endLine: Int): Int {
+      var mutableEndLine = endLine
+      while (mutableEndLine >= 0) {
+        if (doc.getLineEndOffset(mutableEndLine) > doc.getLineStartOffset(mutableEndLine)) {
+          return mutableEndLine
+        }
+
+        mutableEndLine--
+      }
+
+      return -1
+    }
+
   }
 }
 

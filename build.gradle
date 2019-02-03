@@ -1,3 +1,6 @@
+import java.time.LocalDate
+import java.time.LocalDateTime
+
 buildscript {
     ext.kotlin_version = kotlinVersion
     repositories {
@@ -15,6 +18,10 @@ plugins {
     id 'se.patrikerdes.use-latest-versions' version '0.2.7'
     id "com.github.ben-manes.versions" version "0.20.0" 
 }
+
+//version = "0.1.0-SNAPSHOT"  // use the code below so locally I ensure I know what version I've got
+def now = LocalDateTime.now()
+version = "${now.year}-${now.monthValue}-${now.dayOfMonth}_${now.hour}_$now.minute"
 
 repositories {
     jcenter()

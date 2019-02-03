@@ -26,14 +26,15 @@ class PropertiesToConfParser {
       propsMap.includesList.forEach { lines.add(it) }
       if (propsMap.includesList.isNotEmpty()) lines.add("")
 
-      // add the properties
-      outputMap(propsMap.map, 0, lines)
+      // add the properties transformed into map format
+      outputMap(propsMap.map, 0, lines, true)
 
       // trim the last extra }
       return lines.subList(0, lines.size - 1)
     }
 
-    private fun outputMap(propsMap: Map<String, Any>, initialIndentLevel: Int, lines: MutableList<String>): Int {
+    /** Output the map into conf format */
+    private fun outputMap(propsMap: Map<String, Any>, initialIndentLevel: Int, lines: MutableList<String>, addBlankLineAfterKey: Boolean): Int {
       var indentLevel = initialIndentLevel;
       for (key in propsMap.keys.toSortedSet()) {
 
@@ -53,7 +54,7 @@ class PropertiesToConfParser {
             }
             indentLevel++
             lines.add("$whiteSpace$key {")
-            indentLevel = outputMap(value as Map<String, Any>, indentLevel, lines)
+            indentLevel = outputMap(value as Map<String, Any>, indentLevel, lines, false)
           }
           else -> {
             var textValue = value as String
@@ -62,9 +63,15 @@ class PropertiesToConfParser {
           }
         }
       }
+
       indentLevel--
       val whiteSpace = StringUtils.repeat("  ", indentLevel)
+//todo this adds an extra "}" at the end of processing - why?
       lines.add("$whiteSpace}")
+
+//      if (addBlankLineAfterKey)
+//        lines.add("")
+
       return indentLevel
     }
 

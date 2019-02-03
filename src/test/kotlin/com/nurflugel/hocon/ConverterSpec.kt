@@ -57,6 +57,29 @@ Test cases:
 class ConverterSpec : StringSpec(
   {
 
+    "properties format simple keys map".config(enabled = false) {
+      val lines = """
+        aaa="kkkk"
+        bbb.three = 5
+        ccc.five = 6
+        """.trimIndent().split("\n")
+      val confLines = convertPropertiesToConf(lines)
+
+
+      val expectedLines = """
+          aaa = "kkkk"
+          bbb {
+            three = 5
+          }
+
+          ccc {
+            five = 6
+          }
+
+""".trimIndent().split("\n")
+
+      confLines shouldBe expectedLines
+    }
     "properties format simple keys" {
       val lines = """
         one="kkkk"
