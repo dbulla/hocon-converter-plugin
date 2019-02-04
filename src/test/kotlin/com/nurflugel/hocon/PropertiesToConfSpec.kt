@@ -70,7 +70,7 @@ class PropertiesToConfSpec : StringSpec(
     }
 
 
-    "properties format simple keys map 2".config(enabled = true) {
+    "properties format simple keys map 2".config(enabled = ALL_TESTS_ENABLED) {
       val lines = getListFromString("""
         bbb.three = 5
         ccc.five = 6
@@ -89,7 +89,7 @@ class PropertiesToConfSpec : StringSpec(
     }
 
 
-    "properties format simple keys map 3".config(enabled = true) {
+    "properties format simple keys map 3".config(enabled = ALL_TESTS_ENABLED) {
       val lines = getListFromString("""
         aaa.zzz=5
         bbb.three = 5
@@ -175,89 +175,104 @@ class PropertiesToConfSpec : StringSpec(
       confLines shouldBe getListFromString("aaaa.bbb.cccc.dddd = true")
     }
 
-    "read in a single line list".config(enabled = true) {
+    "read in a single line list".config(enabled = ALL_TESTS_ENABLED) {
       val propertyLines = getListFromString("""
         aa="ff"
         cors = ["123","456","789" ]
         dd=false
       """)
       val confLines = convertPropertiesToConf(propertyLines)
+      confLines.forEach { println(it) }
       confLines shouldBe getListFromString("""
         aa = "ff"
-        cors = ["123","456","789" ]
+        cors = [
+          "123",
+          "456",
+          "789"
+        ]
         dd = false
       """.trimIndent())
     }
 
     /** I figure you should be all properties or not, but lists may be vertical, so we gotta deal with them */
-    "read in a multi-line list all lines separate".config(enabled = true) {
+    "read in a multi-line list all lines separate".config(enabled = ALL_TESTS_ENABLED) {
       val propertyLines = getListFromString("""
-        aa="ff"
         cors = [
           "123",
           "456",
           "789"
         ]
-        dd=false
       """)
       val confLines = convertPropertiesToConf(propertyLines)
       confLines shouldBe getListFromString("""
-        aa = "ff"
         cors = [
           "123",
           "456",
           "789"
         ]
-        dd = false
       """.trimIndent())
     }
 
-    "read in a multi-line list [ same lines".config(enabled = true) {
+    "read in a multi-line list [ same lines".config(enabled = ALL_TESTS_ENABLED) {
       val propertyLines = getListFromString("""
-        aa="ff"
         cors = [ "123",
           "456",
           "789"
         ]
-        dd=false
       """)
       val confLines = convertPropertiesToConf(propertyLines)
       confLines shouldBe getListFromString("""
-        aa = "ff"
         cors = [
           "123",
           "456",
           "789"
         ]
-        dd = false
       """.trimIndent())
     }
 
-    "read in a multi-line list ] same lines".config(enabled = true) {
+    "read in a multi-line list ] same lines".config(enabled = ALL_TESTS_ENABLED) {
       val propertyLines = getListFromString("""
-        aa="ff"
         cors = [
           "123",
           "456",
           "789" ]
-        dd=false
       """)
       val confLines = convertPropertiesToConf(propertyLines)
       confLines shouldBe getListFromString("""
-        aa = "ff"
         cors = [
           "123",
           "456",
           "789"
         ]
-        dd = false
+      """.trimIndent())
+    }
+
+
+    "read in a multi-line list with other keys ] same lines".config(enabled = ALL_TESTS_ENABLED) {
+      val propertyLines = getListFromString("""
+        abc = 678
+        cors = [
+          "123",
+          "456",
+          "789" ]
+        def=999
+      """)
+      val confLines = convertPropertiesToConf(propertyLines)
+      confLines shouldBe getListFromString("""
+        abc = 678
+        cors = [
+          "123",
+          "456",
+          "789"
+        ]
+        def = 999
       """.trimIndent())
     }
 
   }) {
   companion object {
+    //    const val ALL_TESTS_ENABLED = false
     const val ALL_TESTS_ENABLED = true
-//    const val ALL_TESTS_ENABLED=false
   }
 }
 

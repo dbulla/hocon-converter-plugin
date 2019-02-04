@@ -33,7 +33,7 @@ class PropertiesToConfParser {
       if (propsMap.includesList.isNotEmpty()) lines.add("")
 
       // add the properties transformed into map format
-      outputMap(propsMap.map, 0, lines, true)
+      outputMap(propsMap.map, 0, lines)
 
       // trim the last blank line if there is one
       if (lines.last().isBlank()) {
@@ -44,46 +44,72 @@ class PropertiesToConfParser {
     }
 
     /** Output the map into conf format */
-    private fun outputMap(propsMap: Map<String, Any>, initialIndentLevel: Int, lines: MutableList<String>, addBlankLineAfterKey: Boolean): Int {
+    private fun outputMap(propsMap: Map<String, Any>, initialIndentLevel: Int, lines: MutableList<String>): Int {
       var indentLevel = initialIndentLevel;
       for (key in propsMap.keys.toSortedSet()) {
 
         val value = propsMap[key]
         // is the value a map, or a key?
         val whiteSpace = StringUtils.repeat("  ", indentLevel)
+        // increase the indent level
         when (value) {
-          is Map<*, *> -> {// increase the indent level
-            // check to see if the value for this key has any maps under it with nothing more than a single
-            // key/value at the end - if so, just output
-            if (false) {
-              if (isSingleKeyValue(value)) {
-
-                val wholeKey: Pair<StringBuilder, String> = getWholeKeyValue(value, StringBuilder())
-                lines.add("""$whiteSpace${wholeKey.first} = ${wholeKey.second}""")
-              }
-            }
-            indentLevel++
-            lines.add("$whiteSpace$key {")
-            indentLevel = outputMap(value as Map<String, Any>, indentLevel, lines, false)
-          }
+          is Map<*, *> -> indentLevel = outputMapLines(value, lines, whiteSpace, indentLevel, key)
+          is HoconList -> indentLevel = outputListLines(value, lines, whiteSpace, indentLevel, key)
           else -> {
-            var textValue = value as String
-            textValue = writeText(textValue)// add quotes if none exist (check for number/booleans first)
-            lines.add("$whiteSpace$key = $textValue")
+            outputPropertyLines(value, lines, whiteSpace, key)
           }
         }
       }
 
       indentLevel--
-      if (indentLevel >= 0) {
+      if (indentLevel >= 0) {// add closing }
         val whiteSpace = StringUtils.repeat("  ", indentLevel)
         lines.add("$whiteSpace}")
       }
-      if (indentLevel == 0) {
-//      if (addBlankLineAfterKey)
+      if (indentLevel == 0) { // add padding between maps
         lines.add("")
       }
       return indentLevel
+    }
+
+    /** output the list */
+    private fun outputListLines(list: HoconList, lines: MutableList<String>, whiteSpace: String?, indentLevel: Int, key: String?): Int {
+
+      lines.add("$whiteSpace$key [")
+      for (value in list.values.withIndex()) {
+        var quotedValue = writeText(value.value)
+        if (!quotedValue.endsWith(",")) {
+          if (value.index < list.values.size - 1) {
+            quotedValue += ","
+          }
+        }
+        lines.add("$whiteSpace  $quotedValue")
+      }
+      lines.add("$whiteSpace]")
+      return indentLevel
+    }
+
+    private fun outputPropertyLines(value: Any?, lines: MutableList<String>, whiteSpace: String?, key: String?) {
+      var textValue = value as String
+      textValue = writeText(textValue)// add quotes if none exist (check for number/booleans first)
+      lines.add("$whiteSpace$key = $textValue")
+    }
+
+    private fun outputMapLines(value: Map<*, *>, lines: MutableList<String>, whiteSpace: String?, indentLevel: Int, key: String?): Int {
+      // check to see if the value for this key has any maps under it with nothing more than a single
+      // key/value at the end - if so, just output
+      var indentLevel1 = indentLevel
+      if (false) {
+        if (isSingleKeyValue(value)) {
+
+          val wholeKey: Pair<StringBuilder, String> = getWholeKeyValue(value, StringBuilder())
+          lines.add("""$whiteSpace${wholeKey.first} = ${wholeKey.second}""")
+        }
+      }
+      indentLevel1++
+      lines.add("$whiteSpace$key {")
+      indentLevel1 = outputMap(value as Map<String, Any>, indentLevel1, lines)
+      return indentLevel1
     }
 
     /** Go through the map and see if there are any more than one key for any sub-map */
@@ -133,42 +159,35 @@ class PropertiesToConfParser {
     private fun populatePropsMap(existingLines: List<String>): PropertiesMap {
       val propsMap = PropertiesMap()
 
-      // add any includes
-      existingLines
-        .map { it.trim() }
-        .filter { it.startsWith("include") }
-        .forEach { propsMap.addInclude(it) }
-
-      existingLines
-        .asSequence()
-        .map { it.trim() }
-        .filter { StringUtils.isNotEmpty(it) } // remove whitespace
-        .filter { !it.startsWith('#') } // skip comments
-        .filter { !it.startsWith("//") }// skip comments
-        .filter { it.contains('=') }//only process lines with '=' in them
-        .map { StringUtils.substringBefore(it, "=").trim() to StringUtils.substringAfter(it, "=").trim() }
-        .toList()
-        .forEach { addToPropsMap(it, propsMap) }
 
       // have to iterate the old-fashioned way, as we may have to go forwards to grab lists, comments, etc.
       var index = 0
-      if (false)
-        while (index < existingLines.size) {
-          val line = existingLines[index].trim()
-          if (StringUtils.isEmpty(line)) continue
-          index = when {
-            // comments
-            line.startsWith("//") || line.startsWith("#") -> processComment(existingLines, index, line)
-            // it's the beginning of a list
-            line.contains("[") -> processList(existingLines, index, line, propsMap)
-            // properties
-            line.contains("=") -> processProperty(line, propsMap, index)
-            // wtf?
-            else -> processUnknown(index, line)
-          }
+      while (index < existingLines.size) {
+        val line = existingLines[index].trim()
+
+        index = when {
+          // empty line, skip for now
+          StringUtils.isEmpty(line) -> index + 1
+          // comments
+          line.startsWith("//") || line.startsWith("#") -> processComment(existingLines, index, line)
+          // it's the beginning of a list
+          line.contains("[") -> processList(existingLines, index, line, propsMap)
+          // properties
+          line.contains("=") -> processProperty(line, propsMap, index)
+          // includes
+          line.startsWith("include") -> processInclude(line, propsMap, index)
+          // wtf?
+          else -> processUnknown(index, line)
+
         }
+      }
 
       return propsMap
+    }
+
+    private fun processInclude(line: String, propsMap: PropertiesMap, index: Int): Int {
+      propsMap.addInclude(line)
+      return index + 1
     }
 
     private fun processUnknown(index: Int, line: String): Int {
@@ -186,23 +205,67 @@ class PropertiesToConfParser {
     /** take the line and start processing the list */
     private fun processList(existingLines: List<String>, index: Int, line: String, propsMap: PropertiesMap): Int {
       // two cases - it's a list all in one line, or it's "vertical"
-      if (line.contains("]")) {
-        val contents = StringUtils.substringBefore(StringUtils.substringAfter(line, "[").trim(), "]").trim()
-        val key = StringUtils.substringBefore(line, "[").trim()
-        val values = contents.split(",")
-        val list = HoconList(key, values, listOf())
-        //todo add to map
-        return index + 1
-      } else {// now iterate until we find the closing bracket
-        // todo implement
-        return index + 1
+      return when {
+        line.contains("]") -> {
+          processSingleLineList(line, propsMap, index)
+        }
+        else -> {
+          processMultilineList(line, index, existingLines, propsMap)
+        }
       }
+    }
+
+    private fun processMultilineList(line: String, index: Int, existingLines: List<String>, propsMap: PropertiesMap): Int {
+      // now iterate until we find the closing bracket
+      val listLines = mutableListOf<String>()
+      val key = StringUtils.substringBefore(line, "[").trim()
+      var offset = 1 // start on the next line
+
+      // check for a value(s) on the same line as the opening bracket
+
+      val possibleValue = StringUtils.substringAfter(line, "[").trim()
+      addBracketValues(possibleValue, listLines)
+      // process the rest
+      while (index + offset < existingLines.size) {
+        val nextLine = existingLines[index + offset].trim()
+        if (nextLine.contains("]")) {
+          // check for any values on the same line as the ]
+          val possibleValue1 = StringUtils.substringBefore(nextLine, "]").trim()
+          addBracketValues(possibleValue1, listLines)
+          break
+        }
+        listLines.add(nextLine)
+        offset++
+      }
+      propsMap.addList(key, HoconList(key, listLines, listOf()))
+      return index + offset + 1
+    }
+
+    /** take some text we found before or after brackets, parse any values for it */
+    private fun addBracketValues(possibleValue: String, listLines: MutableList<String>) {
+      if (possibleValue.isNotBlank()) {
+        val split = possibleValue.split(",")
+        split.forEach { s ->
+          if (s.isNotBlank()) {
+            listLines.add(s.trim())
+          }
+        }
+      }
+    }
+
+    private fun processSingleLineList(line: String, propsMap: PropertiesMap, index: Int): Int {
+      val contents = StringUtils.substringBefore(StringUtils.substringAfter(line, "[").trim(), "]").trim()
+      val key = StringUtils.substringBefore(line, "[").trim()
+      val values = contents.split(",")
+      val list = HoconList(key, values, listOf())// no comments for now
+      propsMap.addList(key, list)
+      return index + 1
     }
 
     /** read down the list of lines until we find a non-comment line.  Then, we bind the comment to that line's property key */
     private fun processComment(existingLines: List<String>, index: Int, line: String): Int {
       println("comment found, ignoring: $line")
-      //todo complete thhis
+      //todo complete this
       return index + 1
     }
 

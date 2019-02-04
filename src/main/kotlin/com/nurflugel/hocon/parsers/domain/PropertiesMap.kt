@@ -7,4 +7,8 @@ class PropertiesMap {
   public fun addInclude(include: String) {
     includesList.add(include)
   }
+
+  fun addList(key: String, list: HoconList) {
+    map[key] = list
+  }
 }
