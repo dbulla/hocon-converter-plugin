@@ -25,4 +25,4 @@ data class HoconList(
   val key: String,
   val values: List<String>,
   val comments: List<String>
-)
+) : HoconType

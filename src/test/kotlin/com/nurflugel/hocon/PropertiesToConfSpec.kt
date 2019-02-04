@@ -124,7 +124,6 @@ class PropertiesToConfSpec : StringSpec(
     }
 
 
-
     "properties format simple keys".config(enabled = ALL_TESTS_ENABLED) {
       val lines = getListFromString("""
         one="kkkk"
