@@ -1,4 +1,4 @@
-package com.nurflugel.hocon.parsers
+package com.nurflugel.hocon.parsers.domain
 
 class PropertiesMap {
   val map = mutableMapOf<String, Any>()

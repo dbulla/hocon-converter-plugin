@@ -1,5 +1,6 @@
 package com.nurflugel.hocon.parsers
 
+import com.nurflugel.hocon.parsers.domain.PropertiesMap
 import org.apache.commons.lang3.StringUtils
 import java.util.*
 
@@ -97,10 +98,10 @@ class ConfToPropertyParser {
         }
 
         private fun processLine(
-            line: String,
-            map: PropertiesMap,
-            keyStack: Stack<String>,
-            outputLines: MutableList<String>
+          line: String,
+          map: PropertiesMap,
+          keyStack: Stack<String>,
+          outputLines: MutableList<String>
         ) {
             println("line = $line")
             when {

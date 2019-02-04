@@ -1,5 +1,7 @@
 package com.nurflugel.hocon.parsers
 
+import com.nurflugel.hocon.parsers.domain.HoconList
+import com.nurflugel.hocon.parsers.domain.PropertiesMap
 import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.math.NumberUtils
@@ -148,7 +150,60 @@ class PropertiesToConfParser {
         .toList()
         .forEach { addToPropsMap(it, propsMap) }
 
+      // have to iterate the old-fashioned way, as we may have to go forwards to grab lists, comments, etc.
+      var index = 0
+      if (false)
+        while (index < existingLines.size) {
+          val line = existingLines[index].trim()
+          if (StringUtils.isEmpty(line)) continue
+          index = when {
+            // comments
+            line.startsWith("//") || line.startsWith("#") -> processComment(existingLines, index, line)
+            // it's the beginning of a list
+            line.contains("[") -> processList(existingLines, index, line, propsMap)
+            // properties
+            line.contains("=") -> processProperty(line, propsMap, index)
+            // wtf?
+            else -> processUnknown(index, line)
+          }
+        }
+
       return propsMap
+    }
+
+    private fun processUnknown(index: Int, line: String): Int {
+      println("Unknown case in parsing line $index: $line")
+      return index + 1
+    }
+
+    /** take the line and convert it into a key/value pair */
+    private fun processProperty(line: String, propsMap: PropertiesMap, index: Int): Int {
+      val pair = StringUtils.substringBefore(line, "=").trim() to StringUtils.substringAfter(line, "=").trim()
+      addToPropsMap(pair, propsMap);
+      return index + 1
+    }
+
+    /** take the line and start processing the list */
+    private fun processList(existingLines: List<String>, index: Int, line: String, propsMap: PropertiesMap): Int {
+      // two cases - it's a list all in one line, or it's "vertical"
+      if (line.contains("]")) {
+        val contents = StringUtils.substringBefore(StringUtils.substringAfter(line, "[").trim(), "]").trim()
+        val key = StringUtils.substringBefore(line, "[").trim()
+        val values = contents.split(",")
+        val list = HoconList(key, values, listOf())
+        //todo add to map
+        return index + 1
+      } else {// now iterate until we find the closing bracket
+        // todo implement
+        return index + 1
+      }
+    }
+
+    /** read down the list of lines until we find a non-comment line.  Then, we bind the comment to that line's property key */
+    private fun processComment(existingLines: List<String>, index: Int, line: String): Int {
+      println("comment found, ignoring: $line")
+      //todo complete thhis
+      return index + 1
     }
 
     // take the pair and add it to the properties map
