@@ -4,6 +4,7 @@ import com.nurflugel.hocon.parsers.domain.PropertiesMap
 import org.apache.commons.lang3.StringUtils
 import java.util.*
 
+@Deprecated("Use PropertiesToConfParser instead")
 class ConfToPropertyParser {
     companion object {
 
@@ -32,7 +33,7 @@ class ConfToPropertyParser {
 //      return propsMap
 //    }
 
-    /** any line with a { is a map, anything with a = in it is a key/value pair
+        /** any line with a { is a map, anything with a = in it is a key/value pair
 
         AGENT_CONFIG_PATH = "agent-config.txt"
 
@@ -98,10 +99,10 @@ class ConfToPropertyParser {
         }
 
         private fun processLine(
-          line: String,
-          map: PropertiesMap,
-          keyStack: Stack<String>,
-          outputLines: MutableList<String>
+            line: String,
+            map: PropertiesMap,
+            keyStack: Stack<String>,
+            outputLines: MutableList<String>
         ) {
             println("line = $line")
             when {
@@ -129,7 +130,7 @@ class ConfToPropertyParser {
 
                 val prefix = keyStack
                     .joinToString(separator = ".")
-                
+
                 val fullKey = when {
                     StringUtils.isEmpty(prefix) -> key
                     else -> "$prefix.$key"

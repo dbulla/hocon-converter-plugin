@@ -8,16 +8,14 @@ import io.kotlintest.specs.StringSpec
 class ListsSpec : StringSpec(
   {
 
-
-    "read in a single line list".config(enabled = ALL_TESTS_ENABLED) {
+      "read in a single line list".config(enabled = ALL_TESTS_ENABLED) {
       val propertyLines = getListFromString("""
         aa="ff"
         cors = ["123","456","789" ]
         dd=false
       """)
-      val confLines = convertPropertiesToConf(propertyLines)
-      confLines.forEach { println(it) }
-      confLines shouldBe getListFromString("""
+          convertPropertiesToConf(propertyLines) shouldBe getListFromString(
+              """
         aa = "ff"
         cors = [
           "123",
@@ -37,8 +35,8 @@ class ListsSpec : StringSpec(
           "789"
         ]
       """)
-      val confLines = convertPropertiesToConf(propertyLines)
-      confLines shouldBe getListFromString("""
+        convertPropertiesToConf(propertyLines) shouldBe getListFromString(
+            """
         cors = [
           "123",
           "456",
@@ -54,8 +52,8 @@ class ListsSpec : StringSpec(
           "789"
         ]
       """)
-      val confLines = convertPropertiesToConf(propertyLines)
-      confLines shouldBe getListFromString("""
+        convertPropertiesToConf(propertyLines) shouldBe getListFromString(
+            """
         cors = [
           "123",
           "456",
@@ -71,8 +69,8 @@ class ListsSpec : StringSpec(
           "456",
           "789" ]
       """)
-      val confLines = convertPropertiesToConf(propertyLines)
-      confLines shouldBe getListFromString("""
+        convertPropertiesToConf(propertyLines) shouldBe getListFromString(
+            """
         cors = [
           "123",
           "456",
@@ -91,8 +89,8 @@ class ListsSpec : StringSpec(
           "789" ]
         def=999
       """)
-      val confLines = convertPropertiesToConf(propertyLines)
-      confLines shouldBe getListFromString("""
+        convertPropertiesToConf(propertyLines) shouldBe getListFromString(
+            """
         abc = 678
         cors = [
           "123",
