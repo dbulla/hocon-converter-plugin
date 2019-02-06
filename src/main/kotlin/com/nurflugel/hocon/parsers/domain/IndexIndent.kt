@@ -9,4 +9,8 @@ class IndexIndent(
     fun increment() {
         index++
     }
+
+  override fun toString(): String {
+    return "index: $index, indent: $indent"
+  }
 }

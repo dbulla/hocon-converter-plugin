@@ -52,10 +52,7 @@ class PropertiesToConfParser {
     ): HoconType {
       return when {
         // empty line, skip for now
-        StringUtils.isEmpty(line) -> {
-          index.increment()
-          HoconBlankLine()
-        }
+        StringUtils.isEmpty(line) -> processBlankLine(index)
         // comments
         isComment(line) -> processComment(existingLines, index, line, propsMap)
         // it's the beginning of a list
@@ -65,10 +62,15 @@ class PropertiesToConfParser {
         // includes
         isInclude(line) -> processInclude(line, propsMap, index)
         // beginning of a map
-        isMap(line) -> processMap(line, propsMap, index)
+        isMap(line) -> processMap(existingLines, line, propsMap, index)
         // wtf?
         else -> processUnknown(index, line)
       }
+    }
+
+    private fun processBlankLine(index: IndexIndent): HoconBlankLine {
+      index.increment()
+      return HoconBlankLine()
     }
 
 
@@ -98,12 +100,9 @@ class PropertiesToConfParser {
     private fun processProperty(line: String, propsMap: PropertiesMap, index: IndexIndent): HoconType {
       val pair = HoconPair(
         StringUtils.substringBefore(line, "=").trim(),
-        HoconString(
-          StringUtils.substringAfter(line, "=").trim(),
-          listOf()
-        ), listOf()
-      )
-      addToPropsMap(pair, propsMap)
+        HoconString(StringUtils.substringAfter(line, "=").trim()
+        ))
+      addToPropsMap(pair, propsMap)// todo deal with key path?
       index.increment()
       return pair
     }
@@ -206,8 +205,29 @@ class PropertiesToConfParser {
       return HoconBlankLine(listOf())
     }
 
-    private fun processMap(line: String, propsMap: PropertiesMap, index: IndexIndent): HoconType {
-      TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    /** the line is a beginning of a map - recurse if needed */
+    private fun processMap(existingLines: List<String>, line: String, propsMap: PropertiesMap, index: IndexIndent): HoconType {
+      val possibleValue = StringUtils.substringAfter(line, "{")
+      if (possibleValue.isNotBlank()) {
+        // deal with values after the {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+      } else {
+
+        val key = StringUtils.substringBefore(line, "{").trim()
+        // is the line a simple key (a), or a mapped key (a.b.c.d)
+        if (key.contains(".")) {
+          val topKey = StringUtils.substringBefore(line, ".").trim()
+          val remainderKey = StringUtils.substringAfter(line, ".").trim()
+          index.increment()
+          TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
+        } else {// single key, now parse the values
+          index.increment()
+          val value = processLine(existingLines[index.index], existingLines, propsMap, index)
+          propsMap.map.set(key, value)
+          return value
+        }
+      }
     }
 
 

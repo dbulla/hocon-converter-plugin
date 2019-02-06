@@ -10,7 +10,7 @@ import io.kotlintest.specs.StringSpec
 class PropertiesToConfSpec : StringSpec(
     {
 
-      "properties format simple keys map 1".config(enabled = true) {
+      "properties format simple keys map 1".config(enabled = ALL_TESTS_ENABLED) {
             val lines = getListFromString(
                 """
         bbb.three = 5
@@ -121,31 +121,6 @@ class PropertiesToConfSpec : StringSpec(
             outputLines[2] shouldBe ""
         }
 
-      "read in a map".config(enabled = false) {
-            val lines = getListFromString(
-                """
-          aaaa {
-             bbbb{
-                cccc {
-                   dddd = true
-                }
-             }
-          }
-          """
-            )
-            convertPropertiesToConf(lines) shouldBe getListFromString(
-                """
-          aaaa {
-             bbbb{
-                cccc {
-                   dddd = true
-                }
-             }
-          }
-          """
-            )
-        }
-
 
         "single mapped key should be as property".config(enabled = false) {
             //todo enable feature
@@ -164,10 +139,75 @@ class PropertiesToConfSpec : StringSpec(
           convertPropertiesToConf(propertyLines) shouldBe getListFromString("aaaa.bbb.cccc.dddd = true")
         }
 
+
+
+      "read in a map level 1".config(enabled = true) {
+        val lines = getListFromString(
+          """
+          aaaa {
+             bbbb = true
+          }
+          """
+        )
+        convertPropertiesToConf(lines) shouldBe getListFromString(
+          """
+          aaaa {
+             bbbb = true
+          }
+          """
+        )
+      }
+
+      "read in a map level 2".config(enabled = false) {
+        val lines = getListFromString(
+          """
+          aaaa {
+             bbbb{
+                cccc  = true
+             }
+          }
+          """
+        )
+        convertPropertiesToConf(lines) shouldBe getListFromString(
+          """
+          aaaa {
+             bbbb{
+                cccc = true
+             }
+          }
+          """
+        )
+      }
+
+      "read in a map level 3".config(enabled = false) {
+        val lines = getListFromString(
+          """
+          aaaa {
+             bbbb{
+                cccc {
+                   dddd = true
+                }
+             }
+          }
+          """
+        )
+        convertPropertiesToConf(lines) shouldBe getListFromString(
+          """
+          aaaa {
+             bbbb{
+                cccc {
+                   dddd = true
+                }
+             }
+          }
+          """
+        )
+      }
+
     }) {
     companion object {
-      //                const val ALL_TESTS_ENABLED = false
-    const val ALL_TESTS_ENABLED = true
+      const val ALL_TESTS_ENABLED = false
+//    const val ALL_TESTS_ENABLED = true
     }
 }
 
