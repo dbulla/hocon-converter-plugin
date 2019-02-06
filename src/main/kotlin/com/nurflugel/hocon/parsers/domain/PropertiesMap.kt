@@ -1,7 +1,7 @@
 package com.nurflugel.hocon.parsers.domain
 
 class PropertiesMap {
-  val map = mutableMapOf<String, Any>()
+  val map = HoconMap("toplevel")
   val includesList = mutableListOf<String>()
 
   public fun addInclude(include: String) {
@@ -9,6 +9,6 @@ class PropertiesMap {
   }
 
   fun addList(key: String, list: HoconList) {
-    map[key] = list
+    map.set(key, list)
   }
 }
