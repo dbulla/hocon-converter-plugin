@@ -10,16 +10,14 @@ import io.kotlintest.specs.StringSpec
 class PropertiesToConfSpec : StringSpec(
     {
 
-        "properties format simple keys map 1".config(enabled = ALL_TESTS_ENABLED) {
+      "properties format simple keys map 1".config(enabled = true) {
             val lines = getListFromString(
                 """
         bbb.three = 5
         """
             )
 
-            val confLines = convertPropertiesToConf(lines)
-
-            confLines shouldBe getListFromString(
+        convertPropertiesToConf(lines) shouldBe getListFromString(
                 """
           bbb {
             three = 5
@@ -35,9 +33,8 @@ class PropertiesToConfSpec : StringSpec(
         ccc.five = 6
         """
             )
-            val confLines = convertPropertiesToConf(lines)
 
-            confLines shouldBe getListFromString(
+          convertPropertiesToConf(lines) shouldBe getListFromString(
                 """
           bbb {
             three = 5
@@ -61,9 +58,8 @@ class PropertiesToConfSpec : StringSpec(
         ddd.eee="wood"
         """
             )
-            val confLines = convertPropertiesToConf(lines)
 
-            confLines shouldBe getListFromString(
+          convertPropertiesToConf(lines) shouldBe getListFromString(
                 """
           aaa {
             zzz = 5
@@ -95,9 +91,8 @@ class PropertiesToConfSpec : StringSpec(
         two.three.four = 5
         """
             )
-            val confLines = convertPropertiesToConf(lines)
 
-            confLines shouldBe getListFromString(
+          convertPropertiesToConf(lines) shouldBe getListFromString(
                 """
           one = "kkkk"
           two {
@@ -126,7 +121,7 @@ class PropertiesToConfSpec : StringSpec(
             outputLines[2] shouldBe ""
         }
 
-        "read in a map".config(enabled = true) {
+      "read in a map".config(enabled = false) {
             val lines = getListFromString(
                 """
           aaaa {
@@ -166,13 +161,12 @@ class PropertiesToConfSpec : StringSpec(
         """
             )
             val propertyLines = convertConfToProperties(lines)
-            val confLines = convertPropertiesToConf(propertyLines)
-            confLines shouldBe getListFromString("aaaa.bbb.cccc.dddd = true")
+          convertPropertiesToConf(propertyLines) shouldBe getListFromString("aaaa.bbb.cccc.dddd = true")
         }
 
     }) {
     companion object {
-        //        const val ALL_TESTS_ENABLED = false
+      //                const val ALL_TESTS_ENABLED = false
     const val ALL_TESTS_ENABLED = true
     }
 }

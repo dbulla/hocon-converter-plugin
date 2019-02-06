@@ -41,7 +41,7 @@ object ConfGenerator {
       val whiteSpace = StringUtils.repeat("  ", indentLevel)
       // increase the indent level
       when (value) {
-        is Map<*, *> -> {
+        is HoconMap -> {
           indentLevel = outputMapLines(value as HoconMap, lines, whiteSpace, indentLevel, key)
         }
         is HoconList -> indentLevel = outputListLines(value, lines, whiteSpace, indentLevel, key)
