@@ -1,5 +1,6 @@
-package com.nurflugel.hocon.parsers
+package com.nurflugel.hocon.generators
 
+import com.nurflugel.hocon.parsers.HoconParser
 import com.nurflugel.hocon.parsers.domain.*
 import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.StringUtils
@@ -92,7 +93,7 @@ object ConfGenerator {
     // key/value at the end - if so, just output
     var indentLevel1 = indentLevel
     if (false) {
-      if (PropertiesToConfParser.isSingleKeyValue(value)) {
+      if (HoconParser.isSingleKeyValue(value)) {
 
         val wholeKey: Pair<StringBuilder, String> = getWholeKeyValue(value, StringBuilder())
         lines.add("""$whiteSpace${wholeKey.first} = ${wholeKey.second}""")
@@ -119,7 +120,7 @@ object ConfGenerator {
   }
 
   /** If the value is a String, ensure it's wrapped in quotes.  Numbers or Booleans, however, are ok as-is */
-  private fun writeText(textValue: String): String {
+  internal fun writeText(textValue: String): String {
 
     return when {
       // It's a number

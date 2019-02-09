@@ -16,16 +16,15 @@
     <actions>
         <group>
             <action id="hocon.convertToProperty"
-                    class="com.nurflugel.hocon.HoconConvertToConfAction"
-                    text="HOCON - Map -> Properties"
-
-                    description="Convert from sort of YAML to sort of properties">
+                    class="com.nurflugel.hocon.HoconConvertToPropertiesAction"
+                    text="HOCON -> Properties"
+                    description="Convert to properties HOCON format">
                 <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt shift p"/>
             </action>
             <action id="hocon.convertToConf"
-                    class="com.nurflugel.hocon.HoconConvertToPropertiesAction"
-                    text="HOCON - Properties -> Map"
-                    description="Convert from sort of properties to sort of YAML">
+                    class="com.nurflugel.hocon.HoconConvertToConfAction"
+                    text="HOCON -> Map"
+                    description="Convert to map-HOCON format">
                 <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt shift c"/>
             </action>
             <add-to-group group-id="EditMenu" anchor="last"/>

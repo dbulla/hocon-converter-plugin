@@ -1,7 +1,7 @@
 package com.nurflugel.hocon
 
 import com.nurflugel.hocon.parsers.ConfToPropertyParser.Companion.createParsingMap
-import com.nurflugel.hocon.parsers.PropertiesToConfParser.Companion.isSingleKeyValue
+import com.nurflugel.hocon.parsers.HoconParser.Companion.isSingleKeyValue
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
 import java.util.*

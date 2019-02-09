@@ -1,5 +1,9 @@
 package com.nurflugel.hocon.parsers.domain
 
+import com.nurflugel.hocon.generators.ConfGenerator.writeText
+
+/** A HoconType can be a map, list, value, etc - it can have comments attached to it regardless
+ * of the sorting used or how the data is formatted for output */
 interface HoconType {
   var comments: List<String>
   // using toName instead of toString, as I might want
@@ -33,9 +37,20 @@ data class HoconList(
   override var comments: List<String> = listOf()
 ) : HoconType {
   override fun toName(): String = key
+
+  /** output the list as a \n delimited String */
+  override fun toString(): String {
+    val sb = StringBuilder("[\n")
+    for (value in values) {
+      val wrappedValue = writeText(value)
+      sb.append(wrappedValue).append(",\n")
+      sb.append("]")
+    }
+    return sb.toString()
+  }
 }
 
-// couldn't I just extend Map?
+// couldn't I just extend Map with a generic type?
 class HoconMap(
   val key: String,
   private val innerMap: MutableMap<String, HoconType> = mutableMapOf(),
@@ -49,9 +64,8 @@ class HoconMap(
   }
 
   fun getValues(): Set<HoconType> = innerMap.values.toSet()
-  fun containsKey(key: String): Boolean {
-    return innerMap.containsKey(key)
-  }
+  fun containsKey(key: String): Boolean = innerMap.containsKey(key)
+  fun entries() = innerMap.entries
 }
 
 
@@ -65,10 +79,11 @@ class HoconPair(
 }
 
 class HoconString(
-  val value: String,
+  private val value: String,
   override var comments: List<String> = listOf()
 ) : HoconType {
   override fun toName(): String = value
+  override fun toString(): String = value
 }
 
 class HoconBlankLine(override var comments: List<String> = listOf()) : HoconType {
@@ -76,13 +91,18 @@ class HoconBlankLine(override var comments: List<String> = listOf()) : HoconType
 }
 
 class HoconInclude(
-  val value: String,
+  private val value: String,
   override var comments: List<String> = listOf()
 ) : HoconType {
   override fun toName(): String = value
 }
 
 class HoconUnknown(override var comments: List<String> = listOf()) : HoconType {
+  override fun toName(): String = ""
+}
+
+/** A special class - represents nothing.  But, could still have comments :) */
+class HoconVoid(override var comments: List<String> = listOf()) : HoconType {
   override fun toName(): String = ""
 }
 

@@ -1,7 +1,7 @@
 package com.nurflugel.hocon
 
+import com.nurflugel.hocon.ConfToPropertiesSpec.Companion.convertToProperties
 import com.nurflugel.hocon.Utils.getListFromString
-import com.nurflugel.hocon.parsers.PropertiesToConfParser.Companion.convertPropertiesToConf
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
 
@@ -14,7 +14,7 @@ class ListsSpec : StringSpec(
         cors = ["123","456","789" ]
         dd=false
       """)
-          convertPropertiesToConf(propertyLines) shouldBe getListFromString(
+        convertToProperties(propertyLines) shouldBe getListFromString(
               """
         aa = "ff"
         cors = [
@@ -35,7 +35,7 @@ class ListsSpec : StringSpec(
           "789"
         ]
       """)
-        convertPropertiesToConf(propertyLines) shouldBe getListFromString(
+      convertToProperties(propertyLines) shouldBe getListFromString(
             """
         cors = [
           "123",
@@ -52,7 +52,7 @@ class ListsSpec : StringSpec(
           "789"
         ]
       """)
-        convertPropertiesToConf(propertyLines) shouldBe getListFromString(
+      convertToProperties(propertyLines) shouldBe getListFromString(
             """
         cors = [
           "123",
@@ -69,7 +69,7 @@ class ListsSpec : StringSpec(
           "456",
           "789" ]
       """)
-        convertPropertiesToConf(propertyLines) shouldBe getListFromString(
+      convertToProperties(propertyLines) shouldBe getListFromString(
             """
         cors = [
           "123",
@@ -89,7 +89,7 @@ class ListsSpec : StringSpec(
           "789" ]
         def=999
       """)
-        convertPropertiesToConf(propertyLines) shouldBe getListFromString(
+      convertToProperties(propertyLines) shouldBe getListFromString(
             """
         abc = 678
         cors = [
@@ -100,7 +100,7 @@ class ListsSpec : StringSpec(
         def = 999
       """.trimIndent())
     }
-
+// todo repeat with other output
   }) {
   companion object {
     //    const val ALL_TESTS_ENABLED = false

@@ -1,6 +1,8 @@
 package com.nurflugel.hocon
 
-import com.nurflugel.hocon.parsers.ConfToPropertyParser.Companion.convertConfToProperties
+import com.nurflugel.hocon.generators.PropertiesGenerator
+import com.nurflugel.hocon.parsers.HoconParser
+import com.nurflugel.hocon.parsers.domain.PropertiesMap
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
 
@@ -58,7 +60,7 @@ class ConfToPropertiesSpec : StringSpec(
         one = "kkkk"
         two.three.four = 5
         """)
-      val propertyLines = convertConfToProperties(lines)
+      val propertyLines = convertToProperties(lines)
       propertyLines shouldBe lines
     }
 
@@ -70,7 +72,7 @@ class ConfToPropertiesSpec : StringSpec(
         dddd = true
         }
 """)
-      val propertyLines = convertConfToProperties(lines)
+      val propertyLines = convertToProperties(lines)
       propertyLines shouldBe Utils.getListFromString("""
         aaaa.bbbb = 5
         aaaa.cccc = "text"
@@ -86,7 +88,7 @@ class ConfToPropertiesSpec : StringSpec(
         aaa.bb.ee="ff"
         aa.bb.cc.dd="f"
         """)
-      val outputLines = convertConfToProperties(lines)
+      val outputLines = convertToProperties(lines)
 
       // same with the other conversion
       outputLines[0] shouldBe """include "reference2.conf""""
@@ -95,7 +97,17 @@ class ConfToPropertiesSpec : StringSpec(
     }
   }) {
   companion object {
+    //      const val ALL_TESTS_ENABLED = false
     const val ALL_TESTS_ENABLED = true
-//    const val ALL_TESTS_ENABLED=false
+
+    /**
+     * this assumes the lines being parsed are pure property lines - just
+     * stuff like aaa.bbb.ccc.dd=true, no maps
+     */
+    fun convertToProperties(existingLines: List<String>): MutableList<String> {
+      val propsMap: PropertiesMap = HoconParser.populatePropsMap(existingLines)
+      return PropertiesGenerator.generatePropertiesOutput(propsMap)
+    }
+
   }
 }

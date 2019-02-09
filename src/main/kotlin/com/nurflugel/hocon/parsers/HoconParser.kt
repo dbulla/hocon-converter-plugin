@@ -4,17 +4,18 @@ import com.nurflugel.hocon.parsers.domain.*
 import org.apache.commons.lang3.StringUtils
 
 
-class PropertiesToConfParser {
+class HoconParser {
   companion object {
 
-    /** this assumes the lines being parsed are pure property lines - just
-     * stuff like aaa.bbb.ccc.dd=true, no maps
-     */
-    fun convertPropertiesToConf(existingLines: List<String>): MutableList<String> {
-      val propsMap: PropertiesMap = populatePropsMap(existingLines)
-      return ConfGenerator.generateConfOutput(propsMap)
-    }
-
+//    /**
+//     * this assumes the lines being parsed are pure property lines - just
+//     * stuff like aaa.bbb.ccc.dd=true, no maps
+//     */
+//    fun convertPropertiesToConf(existingLines: List<String>): MutableList<String> {
+//      val propsMap: PropertiesMap = populatePropsMap(existingLines)
+//      return generateConfOutput(propsMap)
+//    }
+//
     /** Go through the map and see if there are any more than one key for any sub-map */
     fun isSingleKeyValue(map: HoconMap): Boolean {
       if (map.getKeys().size > 1) return false
@@ -32,8 +33,9 @@ class PropertiesToConfParser {
 
 
     /** We're taking in a list of key-value pairs (no {} mapping and creating the map */
-    private fun populatePropsMap(existingLines: List<String>): PropertiesMap {
+    internal fun populatePropsMap(existingLines: List<String>): PropertiesMap {
       val propsMap = PropertiesMap()
+
 
       // have to iterate the old-fashioned way, as we may have to go forwards to grab lists, comments, etc.
       val index = IndexIndent()
@@ -52,21 +54,39 @@ class PropertiesToConfParser {
     ): HoconType {
       return when {
         // empty line, skip for now
-        StringUtils.isEmpty(line) -> processBlankLine(index)
+        isEmptyLine(line) -> processBlankLine(index)
+
         // comments
         isComment(line) -> processComment(existingLines, index, line, propsMap)
+
         // it's the beginning of a list
         isListStart(line) -> processList(existingLines, index, line, propsMap)
+
+        // beginning of a map
+        isMapStart(line) -> addLevelToKeyStack(line, index)
+
+        // or the end of one
+        isMapEnd(line) -> popStack(line, index)
+
         // properties
         isProperty(line) -> processProperty(line, propsMap, index)
+
         // includes
         isInclude(line) -> processInclude(line, propsMap, index)
-        // beginning of a map
-        isMap(line) -> processMap(existingLines, line, propsMap, index)
+
         // wtf?
         else -> processUnknown(index, line)
       }
     }
+
+    private fun popStack(line: String, index: IndexIndent): HoconType {
+      val numMatches = StringUtils.countMatches(line, "}")
+      repeat((0 until numMatches).count()) { index.keyStack.pop() }
+      index.increment()
+      return HoconVoid()
+    }
+
+    private fun isEmptyLine(line: String) = StringUtils.isEmpty(line)
 
     private fun processBlankLine(index: IndexIndent): HoconBlankLine {
       index.increment()
@@ -74,15 +94,12 @@ class PropertiesToConfParser {
     }
 
 
-    private fun isInclude(line: String) = line.startsWith("include")
-
-    private fun isProperty(line: String) = line.contains("=")
-
-    private fun isListStart(line: String) = line.contains("[")
-
     private fun isComment(line: String) = line.startsWith("//") || line.startsWith("#")
-
-    private fun isMap(line: String) = line.contains("{")
+    private fun isInclude(line: String) = line.startsWith("include")
+    private fun isListStart(line: String) = line.contains("[")
+    private fun isMapEnd(line: String) = !line.contains("=") && line.contains("}")
+    private fun isMapStart(line: String) = !line.contains("=") && line.contains("{")
+    private fun isProperty(line: String) = line.contains("=")
 
     private fun processInclude(line: String, propsMap: PropertiesMap, index: IndexIndent): HoconType {
       propsMap.addInclude(line)
@@ -98,10 +115,17 @@ class PropertiesToConfParser {
 
     /** take the line and convert it into a key/value pair */
     private fun processProperty(line: String, propsMap: PropertiesMap, index: IndexIndent): HoconType {
-      val pair = HoconPair(
-        StringUtils.substringBefore(line, "=").trim(),
-        HoconString(StringUtils.substringAfter(line, "=").trim()
-        ))
+      val prefix = index.keyStack
+        .joinToString(separator = ".")
+      val key = StringUtils.substringBefore(line, "=").trim()
+      val value = HoconString(StringUtils.substringAfter(line, "=").trim())
+
+      // the full key includes everything in the stack as a prefix
+      val pair = when {
+        prefix.isNotBlank() -> HoconPair("$prefix.$key", value)
+        else -> HoconPair(key, value)
+      }
+
       addToPropsMap(pair, propsMap)// todo deal with key path?
       index.increment()
       return pair
@@ -157,7 +181,8 @@ class PropertiesToConfParser {
     }
 
     /** take some text we found before or after brackets, parse any values for it */
-    private fun addBracketValues(possibleValue: String, listLines: MutableList<String>) {
+    private fun addBracketValues(possibleValue: String,
+                                 listLines: MutableList<String>) {
       if (possibleValue.isNotBlank()) {
         val split = possibleValue.split(",")
         split.forEach { s ->
@@ -168,7 +193,9 @@ class PropertiesToConfParser {
       }
     }
 
-    private fun processSingleLineList(line: String, propsMap: PropertiesMap, index: IndexIndent): HoconList {
+    private fun processSingleLineList(line: String,
+                                      propsMap: PropertiesMap,
+                                      index: IndexIndent): HoconList {
       val contents = StringUtils.substringBefore(StringUtils.substringAfter(line, "[").trim(), "]").trim()
       val key = StringUtils.substringBefore(line, "[").trim()
       val values = contents.split(",")
@@ -190,15 +217,17 @@ class PropertiesToConfParser {
       var nextLine: String
       // process the rest
       index.increment()// start at the next line
+
       while (index.index < existingLines.size) {
         nextLine = existingLines[index.index].trim()
-        if (isComment(nextLine)) {
-          comments.add(nextLine)
-        } else {
-          // we have a line that's not a comment - parse that and get the type
-          val type = processLine(nextLine, existingLines, propsMap, index)
-          type.comments = comments
-          return type
+        when {
+          isComment(nextLine) -> comments.add(nextLine)
+          else -> {
+            // we have a line that's not a comment - parse that and get the type
+            val type = processLine(nextLine, existingLines, propsMap, index)
+            type.comments = comments
+            return type
+          }
         }
         index.increment()
       }
@@ -206,28 +235,41 @@ class PropertiesToConfParser {
     }
 
     /** the line is a beginning of a map - recurse if needed */
-    private fun processMap(existingLines: List<String>, line: String, propsMap: PropertiesMap, index: IndexIndent): HoconType {
-      val possibleValue = StringUtils.substringAfter(line, "{")
+    private fun addLevelToKeyStack(line: String,
+                                   index: IndexIndent): HoconType {
+      val possibleValue = StringUtils.substringAfter(line, "{").trim()
       if (possibleValue.isNotBlank()) {
         // deal with values after the {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
       } else {
 
         val key = StringUtils.substringBefore(line, "{").trim()
-        // is the line a simple key (a), or a mapped key (a.b.c.d)
-        if (key.contains(".")) {
-          val topKey = StringUtils.substringBefore(line, ".").trim()
-          val remainderKey = StringUtils.substringAfter(line, ".").trim()
-          index.increment()
-          TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
 
-        } else {// single key, now parse the values
-          index.increment()
-          val value = processLine(existingLines[index.index], existingLines, propsMap, index)
-          propsMap.map.set(key, value)
-          return value
+        // is the line a simple key? (a)
+        return when {
+          key.contains(".") -> addNestedKeysToStack(line, index)
+          else -> addSingleKeyToStack(index, key)
         }
       }
+    }
+
+    private fun addNestedKeysToStack(line: String, index: IndexIndent): HoconType {
+      // or a mapped key? (a.b.c.d)
+      val topKey = StringUtils.substringBefore(line, ".").trim()
+      index.keyStack.push(topKey)
+      val remainderKey = StringUtils.substringAfter(line, ".").trim()
+      index.increment()
+
+      TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    // single key, now parse the values
+    private fun addSingleKeyToStack(index: IndexIndent, key: String): HoconVoid {
+      index.keyStack.push(key)
+      index.increment()
+      //          val value = processLine(existingLines[index.index], existingLines, propsMap, index)
+      //          propsMap.map.set(key, value)
+      return HoconVoid()// tod return HoconKey?
     }
 
 
@@ -246,11 +288,12 @@ class PropertiesToConfParser {
       subMap.set(keyPath.last(), keyValue.value)
     }
 
+    // todo make a test
     private fun getSubMap(propsMap: HoconMap, folderName: String): HoconMap {
       if (!propsMap.containsKey(folderName)) {
-        val map = HoconMap(folderName)
-        propsMap.set(folderName, map)
-        return map
+        val newMap = HoconMap(folderName)
+        propsMap.set(folderName, newMap)
+        return newMap
       }
       val hoconType = propsMap.get(folderName)
       if (hoconType is HoconString) {
