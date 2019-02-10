@@ -4,8 +4,71 @@
     <version>0.0.1</version>
     <vendor email="dbullard@nurflugel.com" url="https://github.com/dbulla/hocon-converter-plugin">Nurflugel.com</vendor>
     <description><![CDATA[
-    Convert between HOCON map form, and HOCON propreties form.<br>
-    <em>most HTML tags may be used</em>
+
+Convert between HOCON map form, and HOCON properties form.<br>
+
+This is a plugin for Intellij IDEA which converts HOCON back and forth between map-like and property-like formats. <br>
+This can be really useful when you need to change Spring property keys (which are resolved like <br>
+<pre>
+    "${aaa.bbb.ccc.ddd}"<br>
+</pre>
+and your files are in .conf format, like<br>
+<pre>
+    aaa {
+      bbb {
+        ccc {
+          ddd = "some value"
+        }
+      }
+    }
+</pre>
+<p>
+
+    Simply convert the .conf-style file into property-style, then you can search/replace</p>
+<b>Features completed</b>
+<ul>
+    <li>read in basic properties-formatted file with simple key/value pairs</li>
+    <li>read in basic conf-formatted file wiht simple key/value pairs & maps</li>
+    <li>Keep "include" at top of file (in order)</li>
+    <li>Top-level lists, like this:</li>
+    <pre>
+cors = [
+  "xxxx",
+  "yyyy"
+]
+</pre>
+</ul>
+<b>What's <em>NOT</em> working</b>
+<ul>
+    <li>Comments</li>
+    <li>Lists inside maps or other lists (only top-level lists are working currently)</li>
+</ul>
+
+
+<b>Planned features</b>
+<ul>
+    <li>Tie comments to line that follows (currently comments are lost)</li>
+    <li>Auto-detection of if the text is from a .yml file - if so, then it needs to be indented after the `app |-`
+        line
+    </li>
+    <li>If a map has only a single key/value, then don't display it in map format in conf output, use key/value
+        output.<br>
+        For example:
+    </li>
+</ul>
+<pre>
+aaa.bbb.ccc = 5
+</pre>
+instead of
+<pre>
+aaa {
+  bbb {
+    ccc = 5
+  }
+}
+</pre>
+
+
     ]]></description>
 
     <depends>com.intellij.modules.lang</depends>

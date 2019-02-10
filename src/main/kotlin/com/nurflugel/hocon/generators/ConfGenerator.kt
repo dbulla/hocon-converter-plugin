@@ -14,7 +14,7 @@ object ConfGenerator {
    *
    * Done with the contents of a map?  Then print  a } and decrease the indent
    * */
-  internal fun generateConfOutput(propsMap: PropertiesMap): MutableList<String> {
+  public fun generateConfOutput(propsMap: PropertiesMap): MutableList<String> {
     val lines = mutableListOf<String>()
 
     // add any includes first
@@ -43,7 +43,7 @@ object ConfGenerator {
       // increase the indent level
       when (value) {
         is HoconMap -> {
-          indentLevel = outputMapLines(value as HoconMap, lines, whiteSpace, indentLevel, key)
+          indentLevel = outputMapLines(value, lines, whiteSpace, indentLevel, key)
         }
         is HoconList -> indentLevel = outputListLines(value, lines, whiteSpace, indentLevel, key)
         else -> {
@@ -66,7 +66,7 @@ object ConfGenerator {
   /** output the list */
   private fun outputListLines(list: HoconList, lines: MutableList<String>, whiteSpace: String?, indentLevel: Int, key: String?): Int {
 
-    lines.add("$whiteSpace$key [")
+    lines.add("$whiteSpace$key = [")
     for (value in list.values.withIndex()) {
       var quotedValue = writeValueMaybeQuotes(value.value)
       if (!quotedValue.endsWith(",")) {

@@ -100,6 +100,24 @@ class ListsSpec : StringSpec(
         def = 999
       """.trimIndent())
     }
+
+
+    /*
+      # enable response compression
+  compression {
+    enabled = true
+    mime-types = [
+      "application/json",
+      "application/xml",
+      "text/html",
+      "text/xml",
+      "text/plain",
+    ]
+  }
+}
+     */
+
+
 // todo repeat with other output
   }) {
   companion object {

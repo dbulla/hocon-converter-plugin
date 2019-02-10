@@ -33,7 +33,7 @@ class HoconParser {
 
 
     /** We're taking in a list of key-value pairs (no {} mapping and creating the map */
-    internal fun populatePropsMap(existingLines: List<String>): PropertiesMap {
+    public fun populatePropsMap(existingLines: List<String>): PropertiesMap {
       val propsMap = PropertiesMap()
 
 
@@ -261,7 +261,6 @@ class HoconParser {
       // or a mapped key? (a.b.c.d)
       val topKey = StringUtils.substringBefore(line, ".").trim()
       index.keyStack.push(topKey)
-      val remainderKey = StringUtils.substringAfter(line, ".").trim()
       index.increment()
 
       TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -271,8 +270,6 @@ class HoconParser {
     private fun addSingleKeyToStack(index: IndexIndent, key: String): HoconVoid {
       index.keyStack.push(key)
       index.increment()
-      //          val value = processLine(existingLines[index.index], existingLines, propsMap, index)
-      //          propsMap.map.set(key, value)
       return HoconVoid()// tod return HoconKey?
     }
 
