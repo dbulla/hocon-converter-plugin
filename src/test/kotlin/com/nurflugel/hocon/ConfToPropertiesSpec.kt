@@ -1,8 +1,11 @@
 package com.nurflugel.hocon
 
-import com.nurflugel.hocon.parsers.ConfToPropertyParser.Companion.convertConfToProperties
+import com.nurflugel.hocon.generators.PropertiesGenerator.generatePropertiesOutput
+import com.nurflugel.hocon.parsers.HoconParser.Companion.populatePropsMap
+import com.nurflugel.hocon.parsers.domain.PropertiesMap
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
+import org.apache.commons.lang3.StringUtils
 
 /*
 
@@ -54,39 +57,39 @@ class ConfToPropertiesSpec : StringSpec(
   {
 
     "conf format simple keys".config(enabled = ALL_TESTS_ENABLED) {
-      val lines = """
+      val lines = Utils.getListFromString("""
         one = "kkkk"
         two.three.four = 5
-        """.trimIndent().split("\n")
-      val propertyLines = convertConfToProperties(lines)
+        """)
+      val propertyLines = convertToProperties(lines)
       propertyLines shouldBe lines
     }
 
     "conf format with map of keys".config(enabled = ALL_TESTS_ENABLED) {
-      val lines = """
+      val lines = Utils.getListFromString("""
         aaaa {
         bbbb = 5
         cccc = "text"
         dddd = true
         }
-""".trimIndent().split("\n")
-      val propertyLines = convertConfToProperties(lines)
-      propertyLines shouldBe """
+""")
+      val propertyLines = convertToProperties(lines)
+      propertyLines shouldBe Utils.getListFromString("""
         aaaa.bbbb = 5
         aaaa.cccc = "text"
         aaaa.dddd = true
-""".trimIndent().split("\n")
+""")
     }
 
     "don't lose the includes in property formatter".config(enabled = ALL_TESTS_ENABLED) {
-      val lines = """
+      val lines = Utils.getListFromString("""
         include "reference2.conf"
         include "reference1.conf"
 
         aaa.bb.ee="ff"
         aa.bb.cc.dd="f"
-        """.trimIndent().split("\n")
-      val outputLines = convertConfToProperties(lines)
+        """)
+      val outputLines = convertToProperties(lines)
 
       // same with the other conversion
       outputLines[0] shouldBe """include "reference2.conf""""
@@ -95,7 +98,39 @@ class ConfToPropertiesSpec : StringSpec(
     }
   }) {
   companion object {
+    //      const val ALL_TESTS_ENABLED = false
     const val ALL_TESTS_ENABLED = true
-//    const val ALL_TESTS_ENABLED=false
+
+    /**
+     * this assumes the lines being parsed are pure property lines - just
+     * stuff like aaa.bbb.ccc.dd=true, no maps
+     */
+    fun convertToProperties(existingLines: List<String>): MutableList<String> {
+      val propsMap: PropertiesMap = populatePropsMap(existingLines)
+      val generatePropertiesOutput = generatePropertiesOutput(propsMap)
+
+      val lines = mutableListOf<String>()
+      generatePropertiesOutput.forEach { line ->
+        when {
+          line.contains("\n") -> {
+            val indent = getIndentFromLine(line)
+            val split = line.split("\n")
+            for (subLine in split) {
+
+              lines.add("$indent  $subLine")
+            }
+          }
+          else -> lines.add(line)
+        }
+      }
+
+      return lines
+    }
+
+    private fun getIndentFromLine(line: String): String {
+      val whiteSpace = StringUtils.substringBefore(line, line.trim())
+      return whiteSpace
+    }
+
   }
 }

@@ -7,8 +7,9 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.EditorWriteActionHandler
 import com.intellij.openapi.editor.actions.TextComponentEditorAction
 import com.nurflugel.hocon.FileUtil.Companion.processLines
-import com.nurflugel.hocon.parsers.ConfToPropertyParser.Companion.convertConfToProperties
-import com.nurflugel.hocon.parsers.PropertiesToConfParser.Companion.convertPropertiesToConf
+import com.nurflugel.hocon.generators.ConfGenerator.generateConfOutput
+import com.nurflugel.hocon.generators.PropertiesGenerator.generatePropertiesOutput
+import com.nurflugel.hocon.parsers.HoconParser.Companion.populatePropsMap
 
 class HoconConvertToPropertiesAction : TextComponentEditorAction(HoconConvertToPropertiesHandler()) {
 
@@ -45,13 +46,17 @@ class FileUtil {
         return
       }
 
+
+      // todo if this is a YAML file, read in only the stuff after app |- and ensure it's indented
       // Extract text as a list of lines
       val lines = extractLines(doc, startLine, endLine)
 
+      val propertiesMap = populatePropsMap(lines)
+
       // Convert to the new format
       val newLines: List<String> = when {
-        isToProperties -> convertPropertiesToConf(lines)
-        else -> convertConfToProperties(lines)
+        isToProperties -> generatePropertiesOutput(propertiesMap)
+        else -> generateConfOutput(propertiesMap)
       }
 
       // Stick it back into the document
