@@ -1,8 +1,10 @@
 package com.nurflugel.hocon.generators
 
-import com.nurflugel.hocon.generators.ConfGenerator.writeText
+import com.nurflugel.hocon.generators.ConfGenerator.writeValueMaybeQuotes
+import com.nurflugel.hocon.parsers.domain.HoconList
 import com.nurflugel.hocon.parsers.domain.HoconMap
 import com.nurflugel.hocon.parsers.domain.PropertiesMap
+import org.apache.commons.lang3.StringUtils
 import java.util.*
 
 object PropertiesGenerator {
@@ -65,10 +67,34 @@ object PropertiesGenerator {
             else -> key
           }
 
-          val wrappedValue = writeText(value.toString())
-          outputLines.add("$fullKey = $wrappedValue")
+
+          when (value) {
+            is HoconList -> {
+              val indentLevel = keyStack.size
+              populateOutputLinesFromList(value, outputLines, fullKey, indentLevel)
+            }
+            else -> {
+              val wrappedValue = writeValueMaybeQuotes(value.toString())
+              outputLines.add("$fullKey = $wrappedValue")
+            }
+          }
         }
       }
     }
+  }
+
+
+  private fun populateOutputLinesFromList(list: HoconList, outputLines: MutableList<String>, fullKey: String, indentLevel: Int) {
+
+    val values = list.values
+    outputLines.add("$fullKey = [")
+    val whitespace = StringUtils.repeat("  ", indentLevel + 1)
+
+    val allButLast = values.size - 1
+    (0 until allButLast).forEach {
+      outputLines.add(whitespace + writeValueMaybeQuotes(values[it]) + ",")
+    }
+    outputLines.add(whitespace + writeValueMaybeQuotes(values[allButLast]))
+    outputLines.add("]")
   }
 }

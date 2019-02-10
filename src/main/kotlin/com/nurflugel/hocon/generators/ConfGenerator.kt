@@ -68,7 +68,7 @@ object ConfGenerator {
 
     lines.add("$whiteSpace$key [")
     for (value in list.values.withIndex()) {
-      var quotedValue = writeText(value.value)
+      var quotedValue = writeValueMaybeQuotes(value.value)
       if (!quotedValue.endsWith(",")) {
         if (value.index < list.values.size - 1) {
           quotedValue += ","
@@ -84,7 +84,7 @@ object ConfGenerator {
     val hoconType = value as HoconType
     var textValue = hoconType.toName()
 
-    textValue = writeText(textValue)// add quotes if none exist (check for number/booleans first)
+    textValue = writeValueMaybeQuotes(textValue)// add quotes if none exist (check for number/booleans first)
     lines.add("$whiteSpace$key = $textValue")
   }
 
@@ -120,7 +120,7 @@ object ConfGenerator {
   }
 
   /** If the value is a String, ensure it's wrapped in quotes.  Numbers or Booleans, however, are ok as-is */
-  internal fun writeText(textValue: String): String {
+  internal fun writeValueMaybeQuotes(textValue: String): String {
 
     return when {
       // It's a number
@@ -132,7 +132,7 @@ object ConfGenerator {
         var result = textValue
 
         // wrap in quotes unless it's a list
-        if (!result.contains('[') && !result.startsWith('"'))
+        if (!result.contains('[') && !result.startsWith('"') && !result.contains("]"))
           result = """"$result""""
         result
       }

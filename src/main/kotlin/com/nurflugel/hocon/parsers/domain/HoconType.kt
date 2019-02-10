@@ -1,6 +1,6 @@
 package com.nurflugel.hocon.parsers.domain
 
-import com.nurflugel.hocon.generators.ConfGenerator.writeText
+import com.nurflugel.hocon.generators.ConfGenerator.writeValueMaybeQuotes
 
 /** A HoconType can be a map, list, value, etc - it can have comments attached to it regardless
  * of the sorting used or how the data is formatted for output */
@@ -42,7 +42,7 @@ data class HoconList(
   override fun toString(): String {
     val sb = StringBuilder("[\n")
 
-    val joinToString = values.joinToString(",\n") { writeText(it) }
+    val joinToString = values.joinToString(",\n") { "  ${writeValueMaybeQuotes(it)}" }
     sb.append(joinToString)
 
     sb.append("\n]")

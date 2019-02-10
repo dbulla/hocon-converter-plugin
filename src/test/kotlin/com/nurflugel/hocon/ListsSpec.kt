@@ -103,7 +103,7 @@ class ListsSpec : StringSpec(
 // todo repeat with other output
   }) {
   companion object {
-    //    const val ALL_TESTS_ENABLED = false
+    //        const val ALL_TESTS_ENABLED = false
     const val ALL_TESTS_ENABLED = true
   }
 }

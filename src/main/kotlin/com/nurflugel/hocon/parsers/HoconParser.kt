@@ -172,7 +172,11 @@ class HoconParser {
           addBracketValues(possibleValue1, listLines)
           break
         }
-        listLines.add(nextLine)
+        val valueToAdd = when {
+          nextLine.contains(",") -> nextLine.substringBefore(",")
+          else -> nextLine
+        }
+        listLines.add(valueToAdd)
         index.increment()
       }
       val list = HoconList(key, listLines)
