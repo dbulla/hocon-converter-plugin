@@ -132,7 +132,8 @@ object ConfGenerator {
         var result = textValue
 
         // wrap in quotes unless it's a list
-        if (!result.contains('[') && !result.startsWith('"')) result = """"$result""""
+        if (!result.contains('[') && !result.startsWith('"'))
+          result = """"$result""""
         result
       }
     }

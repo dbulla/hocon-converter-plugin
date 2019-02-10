@@ -1,10 +1,11 @@
 package com.nurflugel.hocon
 
-import com.nurflugel.hocon.generators.PropertiesGenerator
-import com.nurflugel.hocon.parsers.HoconParser
+import com.nurflugel.hocon.generators.PropertiesGenerator.generatePropertiesOutput
+import com.nurflugel.hocon.parsers.HoconParser.Companion.populatePropsMap
 import com.nurflugel.hocon.parsers.domain.PropertiesMap
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
+import org.apache.commons.lang3.StringUtils
 
 /*
 
@@ -105,8 +106,30 @@ class ConfToPropertiesSpec : StringSpec(
      * stuff like aaa.bbb.ccc.dd=true, no maps
      */
     fun convertToProperties(existingLines: List<String>): MutableList<String> {
-      val propsMap: PropertiesMap = HoconParser.populatePropsMap(existingLines)
-      return PropertiesGenerator.generatePropertiesOutput(propsMap)
+      val propsMap: PropertiesMap = populatePropsMap(existingLines)
+      val generatePropertiesOutput = generatePropertiesOutput(propsMap)
+
+      val lines = mutableListOf<String>()
+      generatePropertiesOutput.forEach { line ->
+        when {
+          line.contains("\n") -> {
+            val indent = getIndentFromLine(line)
+            val split = line.split("\n")
+            for (subLine in split) {
+
+              lines.add("$indent  $subLine")
+            }
+          }
+          else -> lines.add(line)
+        }
+      }
+
+      return lines
+    }
+
+    private fun getIndentFromLine(line: String): String {
+      val whiteSpace = StringUtils.substringBefore(line, line.trim())
+      return whiteSpace
     }
 
   }

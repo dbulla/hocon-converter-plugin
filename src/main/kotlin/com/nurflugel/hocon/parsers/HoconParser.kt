@@ -157,7 +157,7 @@ class HoconParser {
     ): HoconList {
       // now iterate until we find the closing bracket
       val listLines = mutableListOf<String>()
-      val key = StringUtils.substringBefore(line, "[").trim()
+      val key = StringUtils.substringBefore(line, "=").trim()
       index.increment()
       // check for a value(s) on the same line as the opening bracket
 
@@ -197,7 +197,7 @@ class HoconParser {
                                       propsMap: PropertiesMap,
                                       index: IndexIndent): HoconList {
       val contents = StringUtils.substringBefore(StringUtils.substringAfter(line, "[").trim(), "]").trim()
-      val key = StringUtils.substringBefore(line, "[").trim()
+      val key = StringUtils.substringBefore(line, "=").trim()
       val values = contents.split(",")
       val list = HoconList(key, values)// no comments for now
       propsMap.addList(key, list)

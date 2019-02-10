@@ -11,16 +11,16 @@ class ListsSpec : StringSpec(
       "read in a single line list".config(enabled = ALL_TESTS_ENABLED) {
       val propertyLines = getListFromString("""
         aa="ff"
-        cors = ["123","456","789" ]
+        cors = ["dfd","sss","ddd" ]
         dd=false
       """)
         convertToProperties(propertyLines) shouldBe getListFromString(
               """
         aa = "ff"
         cors = [
-          "123",
-          "456",
-          "789"
+          "dfd",
+          "sss",
+          "ddd"
         ]
         dd = false
       """.trimIndent())

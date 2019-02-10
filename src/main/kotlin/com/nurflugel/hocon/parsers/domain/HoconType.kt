@@ -41,11 +41,11 @@ data class HoconList(
   /** output the list as a \n delimited String */
   override fun toString(): String {
     val sb = StringBuilder("[\n")
-    for (value in values) {
-      val wrappedValue = writeText(value)
-      sb.append(wrappedValue).append(",\n")
-      sb.append("]")
-    }
+
+    val joinToString = values.joinToString(",\n") { writeText(it) }
+    sb.append(joinToString)
+
+    sb.append("\n]")
     return sb.toString()
   }
 }
