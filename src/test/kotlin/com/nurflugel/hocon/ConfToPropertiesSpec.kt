@@ -72,13 +72,13 @@ class ConfToPropertiesSpec : StringSpec(
         cccc = "text"
         dddd = true
         }
-""")
+        """)
       val propertyLines = convertToProperties(lines)
       propertyLines shouldBe Utils.getListFromString("""
         aaaa.bbbb = 5
         aaaa.cccc = "text"
         aaaa.dddd = true
-""")
+        """)
     }
 
     "don't lose the includes in property formatter".config(enabled = ALL_TESTS_ENABLED) {
