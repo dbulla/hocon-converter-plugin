@@ -8,6 +8,13 @@ interface HoconType {
   var comments: List<String>
   // using toName instead of toString, as I might want
   fun toName(): String
+
+  fun addCommentsLines(lines: MutableList<String>) {
+    if (comments.isNotEmpty()) {
+      //                                    outputLines.add("")// blank space before the comment might be nice...
+      comments.forEach { lines.add(it) }
+    }
+  }
 }
 
 /** Representation of a HOCON list.  These are all valid versions of a list:
