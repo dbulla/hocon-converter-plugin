@@ -8,8 +8,9 @@ class Examples1Spec : StringSpec(
     {
 
 
-        "realExample1".config(enabled = ConfToPropertiesSpec.ALL_TESTS_ENABLED) {
-            val lines = Utils.getListFromString("""
+        "realExample1".config(enabled = ALL_TESTS_ENABLED) {
+            val lines = Utils.getListFromString(
+                """
             das {
               aws {
                 s3 {
@@ -64,9 +65,11 @@ class Examples1Spec : StringSpec(
                 username = "passs"
               }
             }
-        """)
+        """
+            )
             val propertyLines = ConfToPropertiesSpec.convertToProperties(lines)
-            propertyLines shouldBe Utils.getListFromString("""
+            propertyLines shouldBe Utils.getListFromString(
+                """
                 das.aws.s3.excel.accesskey = "aaaa"
                 das.aws.s3.excel.bucket.name = "dddd-preprod-ssss"
                 das.aws.s3.excel.secretkey = "asdf"
@@ -94,7 +97,64 @@ class Examples1Spec : StringSpec(
                 database.das.password = "aassdfadsfasdfasdf"
                 database.das.url = "jdbc:oracle:thin:@aaaaa.bbbb.net:1521:DDDDD"
                 database.das.username = "passs"
-                """)
+                """
+            )
+        }
+
+        "realExample2 chained keys in key".config(enabled = ALL_TESTS_ENABLED) {
+            val lines = Utils.getListFromString(
+                """
+            das.aws {
+              key = "qa"
+            }
+        """
+            )
+            val propertyLines = ConfToPropertiesSpec.convertToProperties(lines)
+            propertyLines shouldBe Utils.getListFromString(
+                """
+                das.aws.key = "qa"
+                """
+            )
+        }
+
+        "realExample2 chained keys in value".config(enabled = ALL_TESTS_ENABLED) {
+            val lines = Utils.getListFromString(
+                """
+            das {
+              toplevel.key = "qa"
+            }
+        """
+            )
+            val propertyLines = ConfToPropertiesSpec.convertToProperties(lines)
+            propertyLines shouldBe Utils.getListFromString(
+                """
+                das.toplevel.key = "qa"
+                """
+            )
+        }
+
+        "realExample3 chained keys in value".config(enabled = ALL_TESTS_ENABLED) {
+            val lines = Utils.getListFromString(
+                """
+            das.dos {
+              toplevel.key = "qa"
+              steven=true
+            }
+        """
+            )
+            val propertyLines = ConfToPropertiesSpec.convertToProperties(lines)
+            propertyLines shouldBe Utils.getListFromString(
+                """
+                das.dos.steven = true
+                das.dos.toplevel.key = "qa"
+                """
+            )
         }
     }
-)
+
+) {
+    companion object {
+        const val ALL_TESTS_ENABLED = true
+//        const val ALL_TESTS_ENABLED=false
+    }
+}
