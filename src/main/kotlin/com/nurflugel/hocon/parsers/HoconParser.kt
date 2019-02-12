@@ -184,8 +184,10 @@ class HoconParser {
         }
 
         /** take some text we found before or after brackets, parse any values for it */
-        private fun addBracketValues(possibleValue: String,
-                                     listLines: MutableList<String>) {
+        private fun addBracketValues(
+            possibleValue: String,
+            listLines: MutableList<String>
+        ) {
             if (possibleValue.isNotBlank()) {
                 val split = possibleValue.split(",")
                 split.forEach { s ->
@@ -196,9 +198,11 @@ class HoconParser {
             }
         }
 
-        private fun processSingleLineList(line: String,
-                                          propsMap: PropertiesMap,
-                                          index: IndexIndent): HoconList {
+        private fun processSingleLineList(
+            line: String,
+            propsMap: PropertiesMap,
+            index: IndexIndent
+        ): HoconList {
             val contents = StringUtils.substringBefore(StringUtils.substringAfter(line, "[").trim(), "]").trim()
             val key = StringUtils.substringBefore(line, "=").trim()
             val values = contents.split(",")
@@ -241,8 +245,10 @@ class HoconParser {
         }
 
         /** the line is a beginning of a map - recurse if needed */
-        private fun addLevelToKeyStack(line: String,
-                                       index: IndexIndent): HoconType {
+        private fun addLevelToKeyStack(
+            line: String,
+            index: IndexIndent
+        ): HoconType {
             val possibleValue = StringUtils.substringAfter(line, "{").trim()
             if (possibleValue.isNotBlank()) {
                 // deal with values after the {
@@ -261,11 +267,12 @@ class HoconParser {
 
         private fun addNestedKeysToStack(line: String, index: IndexIndent): HoconType {
             // or a mapped key? (a.b.c.d)
-            val topKey = StringUtils.substringBefore(line, ".").trim()
-            index.keyStack.push(topKey)
+            line.substringBefore("{").trim().split(".")
+                .forEach {
+                    index.keyStack.push(it)
+                }
             index.increment()
-
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            return HoconVoid()
         }
 
         // single key, now parse the values
