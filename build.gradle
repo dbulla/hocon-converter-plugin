@@ -20,7 +20,7 @@ plugins {
 
 def now = LocalDateTime.now()
 version = "${now.year}-${now.monthValue}-${now.dayOfMonth}_${now.hour}_$now.minute"
-version = "0.2.1"  // use the code above so locally I ensure I know what version I've got
+version = "0.2.2"  // use the code above so locally I ensure I know what version I've got
 
 repositories {
     jcenter()

@@ -33,7 +33,8 @@
 
 
     <description><![CDATA[
-Convert between HOCON map form, and HOCON properties form.<br>
+
+Convert between HOCON map form, and HOCON properties form.<p>
 
 This is a plugin for Intellij IDEA which converts HOCON back and forth between map-like and property-like formats. <br>
 This can be really useful when you need to change Spring property keys (which are resolved like <br>
@@ -52,7 +53,8 @@ and your files are in .conf format, like<br>
 </pre>
 <p>
 
-    Simply convert the .conf-style file into property-style, then you can search/replace</p>
+Simply convert the .conf-style file into property-style, then you can search/replace<p>
+
 <b>Features completed</b>
 <ul>
     <li>read in basic properties-formatted file with simple key/value pairs</li>
@@ -107,6 +109,20 @@ aaa.bbb {
 </ul>
 
     ]]></description>
-
+    <change-notes><![CDATA[
+<p>0.2.1 </p>
+<ul>
+    <li>Bug fix - deal with parsing partially flattened keys, like
+        <pre>
+aaa.bbb {
+ddd.eee = 5
+}</pre>
+    </li>
+</ul>
+<p>0.1.0</p>
+<ul>
+    <li>Initial release</li>
+</ul>
+   ]]></change-notes>
 
 </idea-plugin>
