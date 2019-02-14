@@ -1,5 +1,6 @@
 package com.nurflugel.hocon.generators
 
+import com.nurflugel.hocon.cofig.ProjectSettings.isFlattenKeys
 import com.nurflugel.hocon.parsers.HoconParser
 import com.nurflugel.hocon.parsers.domain.*
 import org.apache.commons.lang3.BooleanUtils
@@ -95,7 +96,7 @@ object ConfGenerator {
         // check to see if the value for this key has any maps under it with nothing more than a single
         // key/value at the end - if so, just output
         var indentLevel1 = indentLevel
-        if (false) {// not implemented yet
+        if (isFlattenKeys(project)) {// not implemented yet
             if (HoconParser.isSingleKeyValue(value)) {
 
                 val wholeKey: Pair<StringBuilder, String> = getWholeKeyValue(value, StringBuilder())
