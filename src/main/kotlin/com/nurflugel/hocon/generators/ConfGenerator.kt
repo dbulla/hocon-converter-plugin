@@ -96,7 +96,7 @@ object ConfGenerator {
         // check to see if the value for this key has any maps under it with nothing more than a single
         // key/value at the end - if so, just output
         var indentLevel1 = indentLevel
-        if (isFlattenKeys(project)) {// not implemented yet
+        if (isFlattenKeys(null)) {// not implemented yet
             if (HoconParser.isSingleKeyValue(value)) {
 
                 val wholeKey: Pair<StringBuilder, String> = getWholeKeyValue(value, StringBuilder())

@@ -16,7 +16,8 @@ object ProjectSettings {
     setEnabled(project, PLUGIN_ENABLED_IN_PROJECT, value)
   }
 
-  fun isFlattenKeys(project: Project): Boolean {
+  fun isFlattenKeys(project: Project?): Boolean {
+    if (project == null) return true // todo remove when fixed
     return ProjectSettings.isEnabled(project, FLATTEN_KEYS_ENABLED)
   }
 
