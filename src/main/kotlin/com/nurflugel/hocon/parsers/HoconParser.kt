@@ -250,7 +250,7 @@ class HoconParser {
             index: IndexIndent
         ): HoconType {
             val possibleValue = StringUtils.substringAfter(line, "{").trim()
-            if (possibleValue.isNotBlank()) {
+            if (possibleValue.isNotBlank() && !possibleValue.startsWith("//") && !possibleValue.startsWith("#")) {
                 // deal with values after the {
                 TODO("not implemented")
             } else {

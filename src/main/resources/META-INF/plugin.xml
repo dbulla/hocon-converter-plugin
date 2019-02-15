@@ -1,13 +1,16 @@
 <idea-plugin>
     <name>HOCON Converter</name>
+    <id>HOCON Converter</id>
     <vendor email="dbullard@nurflugel.com" url="https://github.com/dbulla/hocon-converter-plugin">
-        https://github.com/dbulla/hocon-converter-plugin
+        Nurlfugel.com
     </vendor>
     <!--    <version>1.0</version>-->
     <depends>com.intellij.modules.lang</depends>
     <change-notes>Release to fix major bug in consecutive maps not flushing the previous key path</change-notes>
 
-    <extensions defaultExtensionNs="com.intellij"/>
+    <extensions defaultExtensionNs="com.intellij">
+        <projectConfigurable displayName="HOCON Converter" instance="com.nurflugel.hocon.cofig.ui.ProjectSettingsPage"/>
+    </extensions>
     <!--<helpset file="myhelp.jar" path="/Help.hs" />-->
 
     <!--What's a valid value for this?-->

@@ -15,7 +15,7 @@ class HoconConvertToPropertiesAction : TextComponentEditorAction(HoconConvertToP
 
   private class HoconConvertToPropertiesHandler : EditorWriteActionHandler() {
     override fun executeWriteAction(editor: Editor, dataContext: DataContext) {
-      processLines(editor, true, false)// todo - read this in from a GUI setting
+      processLines(editor, true)
     }
   }
 }
@@ -24,7 +24,8 @@ class HoconConvertToConfAction : TextComponentEditorAction(HoconConvertToConfHan
 
   private class HoconConvertToConfHandler : EditorWriteActionHandler() {
     override fun executeWriteAction(editor: Editor, dataContext: DataContext) {
-      processLines(editor, false, false)// todo - read this in from a GUI setting
+      editor.project
+      processLines(editor, false)
     }
   }
 }
@@ -32,15 +33,11 @@ class HoconConvertToConfAction : TextComponentEditorAction(HoconConvertToConfHan
 class FileUtil {
   companion object {
     /**
-     * dgbtodo ugly, think of a better way to pass the logic
      * @param isToProperties if true, we're going from conf to properties.  If false, from properties to conf
      *
      */
-    fun processLines(
-      editor: Editor,
-      isToProperties: Boolean,
-      flattenKeys: Boolean
-    ) {
+    fun processLines(editor: Editor, isToProperties: Boolean) {
+      val project = editor.project!!
       val triple = extractText(editor)
       val doc = triple.first
       val startLine: Int = triple.second
@@ -60,7 +57,7 @@ class FileUtil {
       // Convert to the new format
       val newLines: List<String> = when {
         isToProperties -> generatePropertiesOutput(propertiesMap)
-        else -> generateConfOutput(propertiesMap, flattenKeys)
+        else -> generateConfOutput(propertiesMap, project)
       }
 
       // Stick it back into the document
