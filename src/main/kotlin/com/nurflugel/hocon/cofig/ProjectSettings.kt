@@ -4,9 +4,9 @@ import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.project.Project
 
 object ProjectSettings {
-  val PREFIX = "HOCON_Converter_"
-  val PLUGIN_ENABLED_IN_PROJECT = PREFIX + "EnabledInProject"
-  val FLATTEN_KEYS_ENABLED = PREFIX + "IS_FLATTEN_KEYS_Enabled"
+  const val PREFIX = "HOCON_Converter_"
+  const val PLUGIN_ENABLED_IN_PROJECT = PREFIX + "EnabledInProject"
+  const val FLATTEN_KEYS_ENABLED = PREFIX + "IS_FLATTEN_KEYS_Enabled"
 
   fun isPluginEnabledInProject(project: Project): Boolean {
     return isEnabled(project, PLUGIN_ENABLED_IN_PROJECT)
@@ -16,8 +16,7 @@ object ProjectSettings {
     setEnabled(project, PLUGIN_ENABLED_IN_PROJECT, value)
   }
 
-  fun isFlattenKeys(project: Project?): Boolean {
-    if (project == null) return true // todo remove when fixed
+  fun isFlattenKeys(project: Project): Boolean {
     return ProjectSettings.isEnabled(project, FLATTEN_KEYS_ENABLED)
   }
 

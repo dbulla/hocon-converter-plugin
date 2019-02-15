@@ -22,7 +22,7 @@ class CommentsSpec : StringSpec(
         dd = false
       """.trimIndent())
             // test conf output
-            convertToConf(propertyLines) shouldBe getListFromString("""
+          convertToConf(propertyLines, false) shouldBe getListFromString("""
         # comment 1
         aa = "ff"
         dd = false
@@ -90,7 +90,7 @@ class CommentsSpec : StringSpec(
           ]
         }
       """)
-            convertToConf(propertyLines) shouldBe getListFromString("""
+          convertToConf(propertyLines, false) shouldBe getListFromString("""
           aa = "ff"
           // comment 2
           dd {
