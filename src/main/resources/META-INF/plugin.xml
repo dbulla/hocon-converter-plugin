@@ -101,31 +101,37 @@ aaa {
 }
 </pre>
 
-<b>Release History</b>
-<ul>
-    <li>0.2.1 Bug fix - deal with flattened keys, like <br>
-        <pre>
-aaa.bbb {
-  ddd.eee = 5
-}</pre>
-    </li>
-</ul>
-
     ]]></description>
+
+
     <change-notes><![CDATA[
-<p>0.2.1 </p>
 <ul>
-    <li>Bug fix - deal with parsing partially flattened keys, like
+    <li><b>0.2.2 Feature</b> - optional flattened keys on map-style output.  Instead of this: <br>
+        <pre>
+aaa {
+  bbb {
+    ddd {
+      eee = 5
+    }
+  }
+  ccc = 4
+}</pre>
+ you get this:<pre>
+aaa {
+  bbb.ddd.eee = 5
+  ccc = 4
+} </pre>
+This can be set in the Preferences panel (under the "Other Settings/HOCON Converter" menu)
+    </li>
+<li><b>0.2.1 Bug fix</b> - deal with parsing partially flattened keys, like
         <pre>
 aaa.bbb {
 ddd.eee = 5
 }</pre>
     </li>
+<li>0.1.0 Initial release</li>
 </ul>
-<p>0.1.0</p>
-<ul>
-    <li>Initial release</li>
-</ul>
+
    ]]></change-notes>
 
 </idea-plugin>
