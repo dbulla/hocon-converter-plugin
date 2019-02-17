@@ -6,10 +6,8 @@
 </head>
 <body>
 
-
-Convert between HOCON map form, and HOCON properties form.<p>
-
-This is a plugin for Intellij IDEA which converts HOCON back and forth between map-like and property-like formats. <br>
+This is a plugin for Intellij IDEA which converts HOCON back and forth between map-like and property-like formats.
+</p>
 This can be really useful when you need to change Spring property keys (which are resolved like <br>
 <pre>
     "${aaa.bbb.ccc.ddd}"<br>
@@ -25,9 +23,8 @@ and your files are in .conf format, like<br>
     }
 </pre>
 <p>
-
     Simply convert the .conf-style file into property-style, then you can search/replace
-<p>
+</p>
 <b>Features completed</b>
 <ul>
     <li>read in basic properties-formatted file with simple key/value pairs</li>
@@ -54,22 +51,7 @@ cors = [
     <li>Auto-detection of if the text is from a .yml file - if so, then it needs to be indented after the `app |-`
         line
     </li>
-    <li>If a map has only a single key/value, then don't display it in map format in conf output, use key/value
-        output.<br>
-        For example:
-    </li>
 </ul>
-<pre>
-aaa.bbb.ccc = 5
-</pre>
-instead of
-<pre>
-aaa {
-  bbb {
-    ccc = 5
-  }
-}
-</pre>
 
 
 
