@@ -12,21 +12,6 @@ import org.apache.commons.lang3.StringUtils
 Test cases:
 
 
- *
- * cors = [
- *    "some url"
- *    "another URL"
- *    "3 times a charm"
- *  ]
- * 
- * 
- * //comments
- * cors = [
- *    "some url"
- *    "another URL"
- *    "3 times a charm"
- *  ]
- * 
  * 
  * alpha.omega=false
  * // A comment before some code
@@ -43,7 +28,7 @@ Test cases:
  * 
  * aaaa {
  * // A comment before some code
- *    bbbb {
+ *    bbbb { // nasty after line comment
  *         abab= 5
  *         // A comment before some code
  *         cccc = "text"
@@ -127,10 +112,7 @@ class ConfToPropertiesSpec : StringSpec(
       return lines
     }
 
-    private fun getIndentFromLine(line: String): String {
-      val whiteSpace = StringUtils.substringBefore(line, line.trim())
-      return whiteSpace
-    }
+      private fun getIndentFromLine(line: String): String = StringUtils.substringBefore(line, line.trim())
 
   }
 }

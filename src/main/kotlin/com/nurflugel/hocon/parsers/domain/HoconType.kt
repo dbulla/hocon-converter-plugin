@@ -57,22 +57,23 @@ data class HoconList(
   }
 }
 
+// todo look at removing the key - It's not really used anywhere...
 // couldn't I just extend Map with a generic type?
 class HoconMap(
-  val key: String,
-  private val innerMap: MutableMap<String, HoconType> = mutableMapOf(),
-  override var comments: List<String> = listOf()
+    val key: String,
+    private val innerMap: MutableMap<String, HoconType> = mutableMapOf(),
+    override var comments: List<String> = listOf()
 ) : HoconType {
-  override fun toName(): String = key
-  fun getKeys() = innerMap.keys
-  fun get(key: String) = innerMap[key]
-  fun set(key: String, value: HoconType) {
-    innerMap[key] = value
-  }
+    override fun toName(): String = key
+    fun getKeys() = innerMap.keys
+    fun get(key: String) = innerMap[key]!!
+    fun set(key: String, value: HoconType) {
+        innerMap[key] = value
+    }
 
-  fun getValues(): Set<HoconType> = innerMap.values.toSet()
-  fun containsKey(key: String): Boolean = innerMap.containsKey(key)
-  fun entries() = innerMap.entries
+    fun getValues(): Set<HoconType> = innerMap.values.toSet()
+    fun containsKey(key: String): Boolean = innerMap.containsKey(key)
+    fun entries() = innerMap.entries
 }
 
 

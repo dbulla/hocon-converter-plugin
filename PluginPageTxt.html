@@ -6,10 +6,8 @@
 </head>
 <body>
 
-
-Convert between HOCON map form, and HOCON properties form.<br>
-
-This is a plugin for Intellij IDEA which converts HOCON back and forth between map-like and property-like formats. <br>
+This is a plugin for Intellij IDEA which converts HOCON back and forth between map-like and property-like formats.
+</p>
 This can be really useful when you need to change Spring property keys (which are resolved like <br>
 <pre>
     "${aaa.bbb.ccc.ddd}"<br>
@@ -25,8 +23,8 @@ and your files are in .conf format, like<br>
     }
 </pre>
 <p>
-
-    Simply convert the .conf-style file into property-style, then you can search/replace</p>
+    Simply convert the .conf-style file into property-style, then you can search/replace
+</p>
 <b>Features completed</b>
 <ul>
     <li>read in basic properties-formatted file with simple key/value pairs</li>
@@ -53,32 +51,45 @@ cors = [
     <li>Auto-detection of if the text is from a .yml file - if so, then it needs to be indented after the `app |-`
         line
     </li>
-    <li>If a map has only a single key/value, then don't display it in map format in conf output, use key/value
-        output.<br>
-        For example:
-    </li>
 </ul>
-<pre>
-aaa.bbb.ccc = 5
-</pre>
-instead of
-<pre>
-aaa {
-  bbb {
-    ccc = 5
-  }
-}
-</pre>
+
+
+
+
+
 
 <b>Release History</b>
+
+
+
+
 <ul>
-    <li>0.2.1 Bug fix - deal with flattened keys, like <br>
+    <li><b>0.2.2 Feature</b> - optional flattened keys on map-style output.  Instead of this: <br>
+        <pre>
+aaa {
+  bbb {
+    ddd {
+      eee = 5
+    }
+  }
+  ccc = 4
+}</pre>
+ you get this:<pre>
+aaa {
+  bbb.ddd.eee = 5
+  ccc = 4
+} </pre>
+This can be set in the Preferences panel (under the "Other Settings/HOCON Converter" menu)
+    </li>
+<li><b>0.2.1 Bug fix</b> - deal with parsing partially flattened keys, like
         <pre>
 aaa.bbb {
-  ddd.eee = 5
+ddd.eee = 5
 }</pre>
     </li>
+<li>0.1.0 Initial release</li>
 </ul>
+
 
 </body>
 </html>

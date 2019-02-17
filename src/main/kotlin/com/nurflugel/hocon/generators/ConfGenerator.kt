@@ -1,5 +1,7 @@
 package com.nurflugel.hocon.generators
 
+import com.intellij.openapi.project.Project
+import com.nurflugel.hocon.cofig.ProjectSettings.Companion.isFlattenKeys
 import com.nurflugel.hocon.parsers.HoconParser
 import com.nurflugel.hocon.parsers.domain.*
 import org.apache.commons.lang3.BooleanUtils
@@ -14,7 +16,7 @@ object ConfGenerator {
      *
      * Done with the contents of a map?  Then print  a } and decrease the indent
      * */
-    public fun generateConfOutput(propsMap: PropertiesMap): MutableList<String> {
+    public fun generateConfOutput(propsMap: PropertiesMap, project: Project): MutableList<String> {
         val lines = mutableListOf<String>()
 
         // add any includes first
@@ -22,7 +24,7 @@ object ConfGenerator {
         if (propsMap.includesList.isNotEmpty()) lines.add("")
 
         // add the properties transformed into map format
-        outputMap(propsMap.map, 0, lines)
+        outputMap(propsMap.map, 0, lines, project)
 
         // trim the last blank line if there is one
         if (lines.last().isBlank()) {
@@ -33,22 +35,21 @@ object ConfGenerator {
     }
 
     /** Output the map into conf format */
-    private fun outputMap(propsMap: HoconMap, initialIndentLevel: Int, lines: MutableList<String>): Int {
+    private fun outputMap(propsMap: HoconMap, initialIndentLevel: Int, lines: MutableList<String>, project: Project): Int {
         var indentLevel = initialIndentLevel;
         for (key in propsMap.getKeys().toSortedSet()) {
 
             val value = propsMap.get(key)
-            if (value != null) {// is the value a map, or a key?
-                val whiteSpace = StringUtils.repeat("  ", indentLevel)
-                // increase the indent level
-                when (value) {
-                    is HoconMap -> {
-                        indentLevel = outputMapLines(value, lines, whiteSpace, indentLevel, key)
-                    }
-                    is HoconList -> indentLevel = outputListLines(value, lines, whiteSpace, indentLevel, key)
-                    else -> {
-                        outputPropertyLines(value, lines, whiteSpace, key)
-                    }
+            // is the value a map, or a key?
+            val whiteSpace = StringUtils.repeat("  ", indentLevel)
+            // increase the indent level
+            when (value) {
+                is HoconMap -> {
+                    indentLevel = outputMapLines(value, lines, whiteSpace, indentLevel, key, project)
+                }
+                is HoconList -> indentLevel = outputListLines(value, lines, whiteSpace, indentLevel, key)
+                else -> {
+                    outputPropertyLines(value, lines, whiteSpace, key)
                 }
             }
         }
@@ -91,20 +92,21 @@ object ConfGenerator {
         lines.add("$whiteSpace$key = $textValue")
     }
 
-    private fun outputMapLines(value: HoconMap, lines: MutableList<String>, whiteSpace: String?, indentLevel: Int, key: String?): Int {
+    private fun outputMapLines(value: HoconMap, lines: MutableList<String>, whiteSpace: String?, indentLevel: Int, key: String, project: Project): Int {
         // check to see if the value for this key has any maps under it with nothing more than a single
         // key/value at the end - if so, just output
         var indentLevel1 = indentLevel
-        if (false) {// not implemented yet
+        if (isFlattenKeys(project)) {// not implemented yet
             if (HoconParser.isSingleKeyValue(value)) {
 
                 val wholeKey: Pair<StringBuilder, String> = getWholeKeyValue(value, StringBuilder())
-                lines.add("""$whiteSpace${wholeKey.first} = ${wholeKey.second}""")
+                lines.add("""$whiteSpace$key.${wholeKey.first} = ${wholeKey.second}""")
+                return indentLevel
             }
         }
         indentLevel1++
         lines.add("$whiteSpace$key {")
-        indentLevel1 = outputMap(value, indentLevel1, lines)
+        indentLevel1 = outputMap(value, indentLevel1, lines, project)
         return indentLevel1
     }
 
@@ -114,7 +116,7 @@ object ConfGenerator {
         val key = map.getKeys().first()
         if (stringBuilder.isNotEmpty()) stringBuilder.append(".")
         stringBuilder.append(key)
-        val value = map.get(key) as HoconType
+        val value = map.get(key)
         if (value is HoconMap) {
             return getWholeKeyValue(value, stringBuilder)
         }

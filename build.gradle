@@ -20,7 +20,7 @@ plugins {
 
 def now = LocalDateTime.now()
 version = "${now.year}-${now.monthValue}-${now.dayOfMonth}_${now.hour}_$now.minute"
-version = "0.2.1"  // use the code above so locally I ensure I know what version I've got
+version = "0.2.2"  // use the code above so locally I ensure I know what version I've got
 
 repositories {
     jcenter()
@@ -39,6 +39,7 @@ test {
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
     testImplementation 'io.kotlintest:kotlintest-runner-junit5:3.2.1'
+    testImplementation "io.mockk:mockk:1.9.1"
 }
 
 apply plugin: 'org.jetbrains.intellij'

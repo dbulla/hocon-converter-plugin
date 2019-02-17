@@ -49,36 +49,35 @@ object PropertiesGenerator {
         for (key in map.getKeys().toSortedSet()) {
             // if this is a terminal property, get the list of all parent keys and add to the output lines
             val value = map.get(key)
-            if (value != null)
-                when (value) {
-                    is HoconMap -> {
-                        // if it's not a terminal entry, push the key into the stack & recurse into the map
-                        keyStack.push(key)
-                        populateOutputLinesFromMap(value, outputLines, keyStack)
+            when (value) {
+                is HoconMap -> {
+                    // if it's not a terminal entry, push the key into the stack & recurse into the map
+                    keyStack.push(key)
+                    populateOutputLinesFromMap(value, outputLines, keyStack)
+                }
+                else -> {
+                    val prefix = keyStack.joinToString(separator = ".")
+
+                    // the full key includes everything in the stack as a prefix
+                    val fullKey = when {
+                        prefix.isNotBlank() -> "$prefix.$key"
+                        else -> key
                     }
-                    else -> {
-                        val prefix = keyStack.joinToString(separator = ".")
 
-                        // the full key includes everything in the stack as a prefix
-                        val fullKey = when {
-                            prefix.isNotBlank() -> "$prefix.$key"
-                            else -> key
+
+                    when (value) {
+                        is HoconList -> {
+                            val indentLevel = keyStack.size
+                            populateOutputLinesFromList(value, outputLines, fullKey, indentLevel)
                         }
-
-
-                        when (value) {
-                            is HoconList -> {
-                                val indentLevel = keyStack.size
-                                populateOutputLinesFromList(value, outputLines, fullKey, indentLevel)
-                            }
-                            else -> {
-                                val wrappedValue = writeValueMaybeQuotes(value.toString())
-                                value.addCommentsLines(outputLines)
-                                outputLines.add("$fullKey = $wrappedValue")
-                            }
+                        else -> {
+                            val wrappedValue = writeValueMaybeQuotes(value.toString())
+                            value.addCommentsLines(outputLines)
+                            outputLines.add("$fullKey = $wrappedValue")
                         }
                     }
                 }
+            }
         }
         if (keyStack.size > 0)// this is a bug, I shouldn't need it
             keyStack.pop()
