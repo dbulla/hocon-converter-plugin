@@ -2,6 +2,7 @@ package com.nurflugel.hocon.generators
 
 import com.intellij.openapi.project.Project
 import com.nurflugel.hocon.cofig.ProjectSettings.Companion.isFlattenKeys
+import com.nurflugel.hocon.cofig.ProjectSettings.Companion.putTopLevelListsAtBottom
 import com.nurflugel.hocon.parsers.HoconParser
 import com.nurflugel.hocon.parsers.domain.*
 import org.apache.commons.lang3.BooleanUtils
@@ -22,32 +23,48 @@ object ConfGenerator {
         // add any includes first
         propsMap.includesList.forEach { lines.add(it) }
         if (propsMap.includesList.isNotEmpty()) lines.add("")
+        val putListsAtBottom = putTopLevelListsAtBottom(project)
+        
 
         // add the properties transformed into map format
-        outputMap(propsMap.map, 0, lines, project)
-
+        outputMap(propsMap.map, 0, lines, project, putListsAtBottom)
+        if (putListsAtBottom) {
+            outputTopLevelListsAtBottom(lines, propsMap.map)
+        }
         // trim the last blank line if there is one
         if (lines.last().isBlank()) {
             lines.removeAt(lines.size - 1)
-            //      return lines.subList(0, lines.size - 1)
         }
         return lines
     }
 
+
     /** Output the map into conf format */
-    private fun outputMap(propsMap: HoconMap, initialIndentLevel: Int, lines: MutableList<String>, project: Project): Int {
-        var indentLevel = initialIndentLevel;
+    private fun outputMap(
+        propsMap: HoconMap,
+        initialIndentLevel: Int,
+        lines: MutableList<String>,
+        project: Project,
+        putListsAtBottom: Boolean
+    ): Int {
+        var indentLevel = initialIndentLevel
         for (key in propsMap.getKeys().toSortedSet()) {
 
             val value = propsMap.get(key)
+
             // is the value a map, or a key?
             val whiteSpace = StringUtils.repeat("  ", indentLevel)
+
             // increase the indent level
             when (value) {
                 is HoconMap -> {
-                    indentLevel = outputMapLines(value, lines, whiteSpace, indentLevel, key, project)
+                    indentLevel = outputMapLines(value, lines, whiteSpace, indentLevel, key, project, putListsAtBottom)
                 }
-                is HoconList -> indentLevel = outputListLines(value, lines, whiteSpace, indentLevel, key)
+                is HoconList -> {
+                    if (!putListsAtBottom || indentLevel != 0) {// output unless it's a top-level list, and we want those at the bottom
+                        indentLevel = outputListLines(value, lines, whiteSpace, indentLevel, key)
+                    }
+                }
                 else -> {
                     outputPropertyLines(value, lines, whiteSpace, key)
                 }
@@ -65,8 +82,24 @@ object ConfGenerator {
         return indentLevel
     }
 
+    /** if we got here, we're going to print out the top-level lists a the bottom */
+    public fun outputTopLevelListsAtBottom(lines: MutableList<String>, map: HoconMap) {
+        map.entries()
+            .filter { it.value is HoconList }
+            .sortedBy { it.key }
+            .forEach { outputListLines(it.value as HoconList, lines, "", 0, it.key) }
+    }
+    
+    
+    
     /** output the list */
-    private fun outputListLines(list: HoconList, lines: MutableList<String>, whiteSpace: String?, indentLevel: Int, key: String?): Int {
+    private fun outputListLines(
+        list: HoconList,
+        lines: MutableList<String>,
+        whiteSpace: String?,
+        indentLevel: Int,
+        key: String
+    ): Int {
 
         list.addCommentsLines(lines)
         lines.add("$whiteSpace$key = [")
@@ -92,11 +125,19 @@ object ConfGenerator {
         lines.add("$whiteSpace$key = $textValue")
     }
 
-    private fun outputMapLines(value: HoconMap, lines: MutableList<String>, whiteSpace: String?, indentLevel: Int, key: String, project: Project): Int {
+    private fun outputMapLines(
+        value: HoconMap,
+        lines: MutableList<String>,
+        whiteSpace: String?,
+        indentLevel: Int,
+        key: String,
+        project: Project,
+        putListsAtBottom: Boolean
+    ): Int {
         // check to see if the value for this key has any maps under it with nothing more than a single
         // key/value at the end - if so, just output
         var indentLevel1 = indentLevel
-        if (isFlattenKeys(project)) {// not implemented yet
+        if (isFlattenKeys(project)) {
             if (HoconParser.isSingleKeyValue(value)) {
 
                 val wholeKey: Pair<StringBuilder, String> = getWholeKeyValue(value, StringBuilder())
@@ -106,7 +147,7 @@ object ConfGenerator {
         }
         indentLevel1++
         lines.add("$whiteSpace$key {")
-        indentLevel1 = outputMap(value, indentLevel1, lines, project)
+        indentLevel1 = outputMap(value, indentLevel1, lines, project, putListsAtBottom)
         return indentLevel1
     }
 

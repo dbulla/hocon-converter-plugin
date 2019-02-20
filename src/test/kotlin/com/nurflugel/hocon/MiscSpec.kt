@@ -31,7 +31,7 @@ class MiscSpec : StringSpec(
 
       "flat path output - first case single key".config(enabled = true) {
           val lines = Utils.getListFromString("aaa.bb.ee=ff")
-          PropertiesToConfSpec.convertToConf(lines, true) shouldBe Utils.getListFromString("aaa.bb.ee = ff")
+        PropertiesToConfSpec.convertToConf(lines, true, false) shouldBe Utils.getListFromString("aaa.bb.ee = ff")
       }
 
       "flat path output - second case nested key".config(enabled = false) {
@@ -41,7 +41,7 @@ class MiscSpec : StringSpec(
           aaa.bb.cc.dd=gg
           """.trimIndent()
           )
-          PropertiesToConfSpec.convertToConf(lines, false) shouldBe Utils.getListFromString(
+        PropertiesToConfSpec.convertToConf(lines, false, false) shouldBe Utils.getListFromString(
               """
           aaa.bb {
             ee = ff

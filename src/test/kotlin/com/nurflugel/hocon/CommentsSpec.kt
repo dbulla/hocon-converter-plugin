@@ -7,80 +7,129 @@ import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
 
 class CommentsSpec : StringSpec(
-    {
+  {
 
-        "read in a single line comment".config(enabled = ALL_TESTS_ENABLED) {
-            val propertyLines = getListFromString("""
+    "read in a single line comment".config(enabled = ALL_TESTS_ENABLED) {
+      val propertyLines = getListFromString(
+        """
         # comment 1
         aa="ff"
         dd=false
-      """)
-            // test prop output
-            convertToProperties(propertyLines) shouldBe getListFromString("""
+      """
+      )
+      // test prop output
+      convertToProperties(propertyLines, false) shouldBe getListFromString(
+        """
         # comment 1
         aa = "ff"
         dd = false
-      """.trimIndent())
-            // test conf output
-            convertToConf(propertyLines, false) shouldBe getListFromString(
-                """
+      """.trimIndent()
+      )
+      // test conf output
+      convertToConf(propertyLines, false, false) shouldBe getListFromString(
+        """
         # comment 1
         aa = "ff"
         dd = false
-      """.trimIndent())
-        }
+      """.trimIndent()
+      )
+    }
 
-        "read in a single line comment not at top".config(enabled = ALL_TESTS_ENABLED) {
-            val propertyLines = getListFromString("""
+    "read in a single line comment not at top".config(enabled = ALL_TESTS_ENABLED) {
+      val propertyLines = getListFromString(
+        """
         aa="ff"
         // comment 2
         dd=false
-      """)
-            convertToProperties(propertyLines) shouldBe getListFromString("""
+      """
+      )
+      convertToProperties(propertyLines, false) shouldBe getListFromString(
+        """
         aa = "ff"
         // comment 2
         dd = false
-      """.trimIndent())
-        }
+      """.trimIndent()
+      )
+    }
 
 
-        "read in a single line comment needs sorting".config(enabled = ALL_TESTS_ENABLED) {
-            val propertyLines = getListFromString("""
+    "read in a single line comment needs sorting".config(enabled = ALL_TESTS_ENABLED) {
+      val propertyLines = getListFromString(
+        """
         // comment 2
         dd=false
         aa="ff"
-      """)
-            convertToProperties(propertyLines) shouldBe getListFromString("""
+      """
+      )
+      convertToProperties(propertyLines, false) shouldBe getListFromString(
+        """
         aa = "ff"
         // comment 2
         dd = false
-      """.trimIndent())
-        }
+      """.trimIndent()
+      )
+    }
 
 
-        "read in a multiline comment".config(enabled = ALL_TESTS_ENABLED) {
-            val propertyLines = getListFromString("""
+    "read in a multiline comment".config(enabled = ALL_TESTS_ENABLED) {
+      val propertyLines = getListFromString(
+        """
         aa="ff"
         // comment 2
         // comment 3
         // comment 4
         // comment 5
         dd=false
-      """)
-            convertToProperties(propertyLines) shouldBe getListFromString("""
+      """
+      )
+      convertToProperties(propertyLines, false) shouldBe getListFromString(
+        """
         aa = "ff"
         // comment 2
         // comment 3
         // comment 4
         // comment 5
         dd = false
-      """.trimIndent())
-        }
+      """.trimIndent()
+      )
+    }
 
 
 
-        "read in a conf with comments".config(enabled = false) {
-            val propertyLines = getListFromString("""
+    "read in a multiline comment with blank lines".config(enabled = false) {
+      //todo make this work
+      val propertyLines = getListFromString(
+        """
+        aa="ff"
+        // comment 2
+        // comment 3
+        
+        
+        // comment 4
+        // comment 5
+        dd=false
+      """
+      )
+      convertToProperties(propertyLines, false) shouldBe getListFromString(
+        """
+        aa = "ff"
+        // comment 2
+        // comment 3
+        
+        
+        // comment 4
+        // comment 5
+        dd = false
+      """.trimIndent()
+      )
+    }
+
+
+
+    "read in a conf with comments".config(enabled = false) {
+      //todo fix
+      val propertyLines = getListFromString(
+        """
         aa="ff"
         // comment 2
         dd {
@@ -90,9 +139,14 @@ class CommentsSpec : StringSpec(
             "123"
           ]
         }
-      """)
-            convertToConf(propertyLines, false) shouldBe getListFromString(
-                """
+      """
+      )
+      convertToConf(
+        propertyLines,
+        flattenKeys = false,
+        putTopLevelListsAtBottom = false
+      ) shouldBe getListFromString(
+        """
           aa = "ff"
           // comment 2
           dd {
@@ -102,9 +156,11 @@ class CommentsSpec : StringSpec(
               "123"
             ]
           }
-      """.trimIndent())
+      """.trimIndent()
+      )
 
-            convertToProperties(propertyLines) shouldBe getListFromString("""
+      convertToProperties(propertyLines, false) shouldBe getListFromString(
+        """
           aa = "ff"
           // comment 2
           dd.sss="lkjlj"
@@ -112,15 +168,16 @@ class CommentsSpec : StringSpec(
           dd.conf = [
             "123"
           ]
-      """.trimIndent())
+      """.trimIndent()
+      )
 
-        }
-
-
-    }) {
-    companion object {
-        //            const val ALL_TESTS_ENABLED = false
-        const val ALL_TESTS_ENABLED = true
     }
+
+
+  }) {
+  companion object {
+    //            const val ALL_TESTS_ENABLED = false
+    const val ALL_TESTS_ENABLED = true
+  }
 }
 

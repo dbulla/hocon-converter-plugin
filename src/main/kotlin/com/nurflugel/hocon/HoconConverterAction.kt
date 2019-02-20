@@ -56,7 +56,7 @@ class FileUtil {
 
       // Convert to the new format
       val newLines: List<String> = when {
-        isToProperties -> generatePropertiesOutput(propertiesMap)
+        isToProperties -> generatePropertiesOutput(propertiesMap, project)
         else -> generateConfOutput(propertiesMap, project)
       }
 

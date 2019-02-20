@@ -1,6 +1,7 @@
 package com.nurflugel.hocon
 
 import com.nurflugel.hocon.ConfToPropertiesSpec.Companion.convertToProperties
+import com.nurflugel.hocon.PropertiesToConfSpec.Companion.convertToConf
 import com.nurflugel.hocon.Utils.getListFromString
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
@@ -14,7 +15,7 @@ class ListsSpec : StringSpec(
         cors = ["dfd","sss","ddd" ]
         dd=false
       """)
-        convertToProperties(propertyLines) shouldBe getListFromString(
+        convertToProperties(propertyLines, false) shouldBe getListFromString(
               """
         aa = "ff"
         cors = [
@@ -35,7 +36,7 @@ class ListsSpec : StringSpec(
           "789"
         ]
       """)
-      convertToProperties(propertyLines) shouldBe getListFromString(
+      convertToProperties(propertyLines, false) shouldBe getListFromString(
             """
         cors = [
           "123",
@@ -52,7 +53,7 @@ class ListsSpec : StringSpec(
           "789"
         ]
       """)
-      convertToProperties(propertyLines) shouldBe getListFromString(
+      convertToProperties(propertyLines, false) shouldBe getListFromString(
             """
         cors = [
           "123",
@@ -69,7 +70,7 @@ class ListsSpec : StringSpec(
           "456",
           "789" ]
       """)
-      convertToProperties(propertyLines) shouldBe getListFromString(
+      convertToProperties(propertyLines, false) shouldBe getListFromString(
             """
         cors = [
           "123",
@@ -89,7 +90,7 @@ class ListsSpec : StringSpec(
           "789" ]
         def=999
       """)
-      convertToProperties(propertyLines) shouldBe getListFromString(
+      convertToProperties(propertyLines, false) shouldBe getListFromString(
             """
         abc = 678
         cors = [
@@ -102,10 +103,142 @@ class ListsSpec : StringSpec(
     }
 
 
+
+    "top-level lists at bottom properties".config(enabled = ALL_TESTS_ENABLED) {
+      val propertyLines = getListFromString(
+        """
+abc = 678
+cors = [
+  "123",
+  "456",
+  "789"
+]
+def = 999
+      """
+      )
+      convertToProperties(propertyLines, true) shouldBe getListFromString(
+        """
+abc = 678
+def = 999
+cors = [
+  "123",
+  "456",
+  "789"
+]
+      """.trimIndent()
+      )
+    }
+
+    "top-level lists at bottom conf".config(enabled = ALL_TESTS_ENABLED) {
+      val propertyLines = getListFromString(
+        """
+abc = 678
+cors = [
+  "123",
+  "456",
+  "789"
+]
+def = 999
+      """
+      )
+      convertToConf(propertyLines, flattenKeys = false, putTopLevelListsAtBottom = true) shouldBe getListFromString(
+        """
+abc = 678
+def = 999
+cors = [
+  "123",
+  "456",
+  "789"
+]
+      """.trimIndent()
+      )
+    }
+
+    "top-level lists at bottom but leave intermediate lists in place props".config(enabled = ALL_TESTS_ENABLED) {
+      val propertyLines = getListFromString(
+        """
+abc {
+   ddd = [
+      1,
+      2
+   ]
+}
+cors = [
+  "123",
+  "456",
+  "789"
+]
+def = 999
+      """
+      )
+      convertToProperties(propertyLines, false) shouldBe getListFromString(
+        """
+abc.ddd = [
+      1,
+      2
+]
+def = 999
+cors = [
+  "123",
+  "456",
+  "789"
+]
+      """.trimIndent()
+      )
+    }
+
+    "top-level lists at bottom but leave intermediate lists in place conf ".config(enabled = ALL_TESTS_ENABLED) {
+      val propertyLines = getListFromString(
+        """
+abc {
+   ddd = [
+      1,
+      2
+   ]
+}
+cors = [
+  "123",
+  "456",
+  "789"
+]
+def = 999
+      """
+      )
+      convertToConf(propertyLines, flattenKeys = false, putTopLevelListsAtBottom = true) shouldBe getListFromString(
+        """
+abc {
+ddd = [
+  1,
+  2
+]
+}
+def = 999
+cors = [
+"123",
+"456",
+"789"
+]
+  """.trimIndent()
+      )
+
+
+    }
+
     /*
+
+
+mime-types = [
+  "application/json",
+  "application/xml",
+  "text/html",
+  "text/xml",
+  "text/plain"
+]
+compression.enabled = true
+
+
       # enable response compression
-  compression {
-    enabled = true
+  compression.enabled = true
     mime-types = [
       "application/json",
       "application/xml",
@@ -113,8 +246,17 @@ class ListsSpec : StringSpec(
       "text/xml",
       "text/plain",
     ]
-  }
-}
+
+
+
+
+
+
+
+
+
+
+
      */
 
 

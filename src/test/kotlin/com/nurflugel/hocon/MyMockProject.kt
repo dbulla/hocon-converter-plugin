@@ -14,7 +14,7 @@ import io.mockk.mockk
 import org.picocontainer.PicoContainer
 
 
-class MyMockProject(private val flattenKeys: Boolean) : Project {
+class MyMockProject(private val flattenKeys: Boolean, private val putTopLevelListsAtBottom: Boolean) : Project {
 
 
   override fun getPicoContainer(): PicoContainer {
@@ -25,6 +25,12 @@ class MyMockProject(private val flattenKeys: Boolean) : Project {
     val mockComponent = mockk<PropertiesComponent>()
 
     every { mockComponent.getBoolean(ProjectSettings.FLATTEN_KEYS_ENABLED, any()) } returns flattenKeys
+    every {
+      mockComponent.getBoolean(
+        ProjectSettings.TOP_LEVEL_LISTS_AT_BOTTOM_ENABLED,
+        any()
+      )
+    } returns putTopLevelListsAtBottom
     every { container.getComponentInstance(any()) } returns mockComponent
     return container
   }
