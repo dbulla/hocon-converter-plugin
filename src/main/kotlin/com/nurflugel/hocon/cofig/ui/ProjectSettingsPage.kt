@@ -20,10 +20,11 @@ import javax.swing.JPanel
 
 class ProjectSettingsPage(private val propertiesComponent: PropertiesComponent) : SearchableConfigurable, Configurable.NoScroll {
     // these need to be vars so the Intellij GUI binder can handle them
-    private var flattenKeysCheckbox: JCheckBox? = null
     private var enablePluginInProjectCheckBox: JCheckBox? = null
+  private var flattenKeysCheckbox: JCheckBox? = null
+  private var putTopLevelListsAtBottomCheckbox: JCheckBox? = null
+
     private var containingPanel: JPanel? = null
-    private var putTopLevelListsAtBottomCheckbox: JCheckBox? = null
 
     override fun getId(): String {
         return "HOCON Converter Plugin"
@@ -69,7 +70,7 @@ class ProjectSettingsPage(private val propertiesComponent: PropertiesComponent) 
         println("Applying settings")
         setPluginEnabledInProject(propertiesComponent, enablePluginInProjectCheckBox!!.isSelected)
         setFlattenKeys(propertiesComponent, flattenKeysCheckbox!!.isSelected)
-        setTopLevelListsAtBottom(propertiesComponent, flattenKeysCheckbox!!.isSelected)
+      setTopLevelListsAtBottom(propertiesComponent, putTopLevelListsAtBottomCheckbox!!.isSelected)
     }
 
     override fun reset() {

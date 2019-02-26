@@ -154,7 +154,7 @@ cors = [
       )
     }
 
-    "top-level lists at bottom but leave intermediate lists in place props".config(enabled = ALL_TESTS_ENABLED) {
+    "top-level lists at bottom but leave intermediate lists in place props".config(enabled = false) {
       val propertyLines = getListFromString(
         """
 abc {
@@ -187,7 +187,7 @@ cors = [
       )
     }
 
-    "top-level lists at bottom but leave intermediate lists in place conf ".config(enabled = ALL_TESTS_ENABLED) {
+    "top-level lists at bottom but leave intermediate lists in place conf ".config(enabled = false) {
       val propertyLines = getListFromString(
         """
 abc {

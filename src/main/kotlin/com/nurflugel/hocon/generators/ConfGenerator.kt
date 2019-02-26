@@ -173,6 +173,8 @@ object ConfGenerator {
             NumberUtils.isParsable(textValue) -> textValue
             // It's a boolean
             BooleanUtils.toBooleanObject(textValue) != null -> textValue
+            // It's a secret
+            textValue.trim().startsWith("\${") && textValue.trim().endsWith("}") -> textValue
             // It's a String
             else -> {
                 var result = textValue
