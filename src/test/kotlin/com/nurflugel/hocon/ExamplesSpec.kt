@@ -67,7 +67,7 @@ class Examples1Spec : StringSpec(
             }
         """
             )
-            val propertyLines = ConfToPropertiesSpec.convertToProperties(lines)
+          val propertyLines = ConfToPropertiesSpec.convertToProperties(lines, false)
             propertyLines shouldBe Utils.getListFromString(
                 """
                 das.aws.s3.excel.accesskey = "aaaa"
@@ -109,7 +109,7 @@ class Examples1Spec : StringSpec(
             }
         """
             )
-            val propertyLines = ConfToPropertiesSpec.convertToProperties(lines)
+          val propertyLines = ConfToPropertiesSpec.convertToProperties(lines, false)
             propertyLines shouldBe Utils.getListFromString(
                 """
                 das.aws.key = "qa"
@@ -125,7 +125,7 @@ class Examples1Spec : StringSpec(
             }
         """
             )
-            val propertyLines = ConfToPropertiesSpec.convertToProperties(lines)
+          val propertyLines = ConfToPropertiesSpec.convertToProperties(lines, false)
             propertyLines shouldBe Utils.getListFromString(
                 """
                 das.toplevel.key = "qa"
@@ -142,7 +142,7 @@ class Examples1Spec : StringSpec(
             }
         """
             )
-            val propertyLines = ConfToPropertiesSpec.convertToProperties(lines)
+          val propertyLines = ConfToPropertiesSpec.convertToProperties(lines, false)
             propertyLines shouldBe Utils.getListFromString(
                 """
                 das.dos.steven = true

@@ -7,6 +7,7 @@ import com.intellij.openapi.options.SearchableConfigurable
 import com.nurflugel.hocon.cofig.ProjectSettings.Companion.isFlattenKeys
 import com.nurflugel.hocon.cofig.ProjectSettings.Companion.isPluginEnabledInProject
 import com.nurflugel.hocon.cofig.ProjectSettings.Companion.isTopLevelListsAtBottom
+import com.nurflugel.hocon.cofig.ProjectSettings.Companion.putTopLevelListsAtBottom
 import com.nurflugel.hocon.cofig.ProjectSettings.Companion.setFlattenKeys
 import com.nurflugel.hocon.cofig.ProjectSettings.Companion.setPluginEnabledInProject
 import com.nurflugel.hocon.cofig.ProjectSettings.Companion.setTopLevelListsAtBottom
@@ -22,7 +23,7 @@ class ProjectSettingsPage(private val propertiesComponent: PropertiesComponent) 
     private var flattenKeysCheckbox: JCheckBox? = null
     private var enablePluginInProjectCheckBox: JCheckBox? = null
     private var containingPanel: JPanel? = null
-    private var listsAtBottomCheckbox: JCheckBox? = null
+    private var putTopLevelListsAtBottomCheckbox: JCheckBox? = null
 
     override fun getId(): String {
         return "HOCON Converter Plugin"
@@ -35,8 +36,8 @@ class ProjectSettingsPage(private val propertiesComponent: PropertiesComponent) 
 
     override fun createComponent(): JComponent? {
         initFromSettings()
-        enablePluginInProjectCheckBox!!.addActionListener { createCheckbox(it, flattenKeysCheckbox) }
-        listsAtBottomCheckbox!!.addActionListener { actionEvent -> createCheckbox(actionEvent, listsAtBottomCheckbox) }
+        flattenKeysCheckbox!!.addActionListener { createCheckbox(it, flattenKeysCheckbox) }
+        putTopLevelListsAtBottomCheckbox!!.addActionListener { createCheckbox(it, putTopLevelListsAtBottomCheckbox) }
         return containingPanel
     }
 
@@ -50,14 +51,16 @@ class ProjectSettingsPage(private val propertiesComponent: PropertiesComponent) 
         println("initFromSettings")
         enablePluginInProjectCheckBox!!.isSelected = isPluginEnabledInProject(propertiesComponent)
         flattenKeysCheckbox!!.isSelected = isFlattenKeys(propertiesComponent)
-        listsAtBottomCheckbox!!.isSelected = isTopLevelListsAtBottom(propertiesComponent)
+        putTopLevelListsAtBottomCheckbox!!.isSelected = putTopLevelListsAtBottom(propertiesComponent)
     }
 
     override fun isModified(): Boolean {
         println("isModified")
         val enabledChanged = enablePluginInProjectCheckBox!!.isSelected != isPluginEnabledInProject(propertiesComponent)
         val flattenKeysChanged = flattenKeysCheckbox!!.isSelected != isFlattenKeys(propertiesComponent)
-        return enabledChanged || flattenKeysChanged
+        val listsAtBottomChanged =
+            putTopLevelListsAtBottomCheckbox!!.isSelected != isTopLevelListsAtBottom(propertiesComponent)
+        return enabledChanged || flattenKeysChanged || listsAtBottomChanged
 
     }
 

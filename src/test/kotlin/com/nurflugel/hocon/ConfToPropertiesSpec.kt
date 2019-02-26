@@ -46,7 +46,7 @@ class ConfToPropertiesSpec : StringSpec(
         one = "kkkk"
         two.three.four = 5
         """)
-      val propertyLines = convertToProperties(lines)
+      val propertyLines = convertToProperties(lines, false)
       propertyLines shouldBe lines
     }
 
@@ -58,7 +58,7 @@ class ConfToPropertiesSpec : StringSpec(
         dddd = true
         }
         """)
-      val propertyLines = convertToProperties(lines)
+      val propertyLines = convertToProperties(lines, false)
       propertyLines shouldBe Utils.getListFromString("""
         aaaa.bbbb = 5
         aaaa.cccc = "text"
@@ -74,7 +74,7 @@ class ConfToPropertiesSpec : StringSpec(
         aaa.bb.ee="ff"
         aa.bb.cc.dd="f"
         """)
-      val outputLines = convertToProperties(lines)
+      val outputLines = convertToProperties(lines, false)
 
       // same with the other conversion
       outputLines[0] shouldBe """include "reference2.conf""""
@@ -90,9 +90,13 @@ class ConfToPropertiesSpec : StringSpec(
      * this assumes the lines being parsed are pure property lines - just
      * stuff like aaa.bbb.ccc.dd=true, no maps
      */
-    fun convertToProperties(existingLines: List<String>): MutableList<String> {
+    fun convertToProperties(
+      existingLines: List<String>,
+      putTopLevelListsAtBottom: Boolean
+    ): MutableList<String> {
       val propsMap: PropertiesMap = populatePropsMap(existingLines)
-      val generatePropertiesOutput = generatePropertiesOutput(propsMap)
+      val project = MyMockProject(false, putTopLevelListsAtBottom)
+      val generatePropertiesOutput = generatePropertiesOutput(propsMap, project)
 
       val lines = mutableListOf<String>()
       generatePropertiesOutput.forEach { line ->

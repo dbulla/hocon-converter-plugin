@@ -36,15 +36,13 @@
           <text value="Enable plugin in project"/>
         </properties>
       </component>
-      <component id="c6b83" class="javax.swing.JCheckBox" binding="listsAtBottomCheckbox">
+      <component id="70b50" class="javax.swing.JCheckBox" binding="putTopLevelListsAtBottomCheckbox">
         <constraints>
           <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <enabled value="false"/>
-          <selected value="false"/>
-          <text value="Put top-level lists at the bottom"/>
-          <visible value="false"/>
+          <selected value="true"/>
+          <text value="Put top-level lists (like cors) at the bottom"/>
         </properties>
       </component>
     </children>

@@ -250,10 +250,8 @@ class HoconParser {
             index: IndexIndent
         ): HoconType {
             val possibleValue = StringUtils.substringAfter(line, "{").trim()
-            if (possibleValue.isNotBlank() && !possibleValue.startsWith("//") && !possibleValue.startsWith("#")) {
-                // deal with values after the {
-                TODO("not implemented")
-            } else {
+
+//      if (possibleValue.isBlank()) {
 
                 val key = StringUtils.substringBefore(line, "{").trim()
 
@@ -262,7 +260,15 @@ class HoconParser {
                     key.contains(".") -> addNestedKeysToStack(line, index)
                     else -> addSingleKeyToStack(index, key)
                 }
-            }
+//      } 
+//      else {
+//        if (!possibleValue.startsWith("//") && !possibleValue.startsWith("#")) {
+//           deal with values after the {
+//          TODO("not implemented")
+//        }else{
+//          
+//        }
+//      }
         }
 
         private fun addNestedKeysToStack(line: String, index: IndexIndent): HoconType {

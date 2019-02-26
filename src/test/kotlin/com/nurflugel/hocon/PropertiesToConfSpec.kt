@@ -19,7 +19,7 @@ class PropertiesToConfSpec : StringSpec(
         """
       )
 
-      convertToConf(lines, false) shouldBe getListFromString(
+      convertToConf(lines, false, false) shouldBe getListFromString(
         """
           bbb {
             three = 5
@@ -36,7 +36,7 @@ class PropertiesToConfSpec : StringSpec(
         """
       )
 
-      convertToConf(lines, false) shouldBe getListFromString(
+      convertToConf(lines, false, false) shouldBe getListFromString(
         """
           bbb {
             three = 5
@@ -61,7 +61,7 @@ class PropertiesToConfSpec : StringSpec(
         """
       )
 
-      convertToConf(lines, false) shouldBe getListFromString(
+      convertToConf(lines, false, false) shouldBe getListFromString(
         """
           aaa {
             zzz = 5
@@ -85,7 +85,8 @@ class PropertiesToConfSpec : StringSpec(
           """
       )
 
-      convertToConf(lines, true) shouldBe getListFromString("""
+      convertToConf(lines, true, false) shouldBe getListFromString(
+        """
          aaa.zzz = 5
          bbb {
            four {
@@ -108,7 +109,7 @@ class PropertiesToConfSpec : StringSpec(
         """
       )
 
-      convertToConf(lines, false) shouldBe getListFromString(
+      convertToConf(lines, false, false) shouldBe getListFromString(
         """
           one = "kkkk"
           two {
@@ -130,7 +131,7 @@ class PropertiesToConfSpec : StringSpec(
         aa.bb.cc.dd="f"
         """
       )
-      val outputLines = convertToConf(lines, false)
+      val outputLines = convertToConf(lines, false, false)
       // ensure order is preserved, as well as the includes just being there
       outputLines[0] shouldBe """include "reference2.conf""""
       outputLines[1] shouldBe """include "reference1.conf""""
@@ -151,8 +152,8 @@ class PropertiesToConfSpec : StringSpec(
         }
         """
       )
-      val propertyLines = convertToProperties(lines)
-      convertToConf(propertyLines, false) shouldBe getListFromString("aaaa.bbb.cccc.dddd = true")
+      val propertyLines = convertToProperties(lines, false)
+      convertToConf(propertyLines, false, false) shouldBe getListFromString("aaaa.bbb.cccc.dddd = true")
     }
 
 
@@ -166,8 +167,9 @@ class PropertiesToConfSpec : StringSpec(
         }
         """
       )
-      val propertyLines = convertToProperties(lines)
-      convertToConf(propertyLines, false) shouldBe getListFromString("""
+      val propertyLines = convertToProperties(lines, false)
+      convertToConf(propertyLines, false, false) shouldBe getListFromString(
+        """
         aaaa {
           bbbb {
             cccc {
@@ -189,7 +191,7 @@ class PropertiesToConfSpec : StringSpec(
           }
           """
       )
-      convertToConf(lines, false) shouldBe getListFromString(
+      convertToConf(lines, false, false) shouldBe getListFromString(
         """
           aaaa {
             bbbb = true
@@ -209,7 +211,7 @@ class PropertiesToConfSpec : StringSpec(
           }
           """
       )
-      convertToConf(lines, false) shouldBe getListFromString(
+      convertToConf(lines, false, false) shouldBe getListFromString(
         """
           aaaa {
             bbbb {
@@ -232,7 +234,7 @@ class PropertiesToConfSpec : StringSpec(
           }
           """
       )
-      convertToConf(lines, false) shouldBe getListFromString(
+      convertToConf(lines, false, false) shouldBe getListFromString(
         """
           aaaa {
             bbbb {
@@ -243,7 +245,7 @@ class PropertiesToConfSpec : StringSpec(
           }
           """
       )
-      convertToConf(lines, true) shouldBe getListFromString(
+      convertToConf(lines, true, false) shouldBe getListFromString(
         """
           aaaa.bbbb.cccc.dddd = true
           """
@@ -258,8 +260,12 @@ class PropertiesToConfSpec : StringSpec(
      * this assumes the lines being parsed are pure property lines - just
      * stuff like aaa.bbb.ccc.dd=true, no maps
      */
-    fun convertToConf(existingLines: List<String>, flattenKeys: Boolean): MutableList<String> {
-      val project = MyMockProject(flattenKeys)
+    fun convertToConf(
+      existingLines: List<String>,
+      flattenKeys: Boolean,
+      putTopLevelListsAtBottom: Boolean
+    ): MutableList<String> {
+      val project = MyMockProject(flattenKeys, putTopLevelListsAtBottom)
       val propsMap: PropertiesMap = HoconParser.populatePropsMap(existingLines)
       return ConfGenerator.generateConfOutput(propsMap, project)
     }
