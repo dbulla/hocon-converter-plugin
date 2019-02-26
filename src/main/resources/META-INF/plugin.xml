@@ -41,7 +41,7 @@ This is a plugin for Intellij IDEA which converts HOCON back and forth between m
 <p>
 This can be really useful when you need to change Spring property keys (which are resolved like <br>
 <pre>
-    "${aaa.bbb.ccc.ddd}"<br>
+    "${aaa.bbb.ccc.ddd}"
 </pre>
 and your files are in .conf format, like<br>
 <pre>
@@ -83,7 +83,7 @@ cors = [
     <li>Auto-detection of if the text is from a .yml file - if so, then it needs to be indented after the `app |-`
         line
     </li>
-</ul>
+  </ul>
 
 
 

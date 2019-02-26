@@ -179,9 +179,7 @@ class HoconParser {
                 index.increment()
             }
             val list = HoconList(key, listLines)
-
-//      propsMap.addList(index.keyStack, key, list)
-          propsMap.addList(key, list)
+            propsMap.addList(key, list)
             return list
         }
 
