@@ -18,7 +18,7 @@ Simply convert the .conf-style file into property-style, then you can search/rep
 
 ### Features completed
  - read in basic properties-formatted file with simple key/value pairs
- - read in basic conf-formatted file wiht simple key/value pairs & maps
+ - read in basic conf-formatted file with simple key/value pairs & maps
  - Keep "include" at top of file (in order)
  - Top-level lists (i.e.,
  ```
