@@ -27,26 +27,16 @@ Simply convert the .conf-style file into property-style, then you can search/rep
    "yyyy"
  ]
  ```
-### What's NOT working
 - Comments
+- Optional flattened keys
+- Optional top-level lists at the bottom
+
+### What's NOT working
 - Lists inside maps or other lists (only top-level lists are working currently)
 
 
 
 ### Planned features
- - Tie comments to line that follows (currently comments are lost)
- - If a map has only a single key/value, then don't display it in map format in conf output, use key/value output.  For example:
- ```
- aaa.bbb.ccc = 5
- ```
-instead of
-```
-aaa {
-  bbb {
-    ccc = 5
-  }
-}
-```
  - Auto-detection of if the text is from a .yml file - if so, then it needs to be indented after the  `app |-` line
  - If possible, do search/replace in-place, even when the file is in .conf format
 
