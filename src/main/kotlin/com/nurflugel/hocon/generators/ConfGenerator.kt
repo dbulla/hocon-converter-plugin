@@ -24,7 +24,7 @@ object ConfGenerator {
         propsMap.includesList.forEach { lines.add(it) }
         if (propsMap.includesList.isNotEmpty()) lines.add("")
         val putListsAtBottom = putTopLevelListsAtBottom(project)
-        
+
 
         // add the properties transformed into map format
         outputMap(propsMap.map, 0, lines, project, putListsAtBottom)
@@ -89,9 +89,8 @@ object ConfGenerator {
             .sortedBy { it.key }
             .forEach { outputListLines(it.value as HoconList, lines, "", 0, it.key) }
     }
-    
-    
-    
+
+
     /** output the list */
     private fun outputListLines(
         list: HoconList,
@@ -166,16 +165,20 @@ object ConfGenerator {
     }
 
     /** If the value is a String, ensure it's wrapped in quotes.  Numbers or Booleans, however, are ok as-is */
-    internal fun writeValueMaybeQuotes(textValue: String): String {
-
+    fun writeValueMaybeQuotes(textValue: String): String {
+        val trimmedValue = textValue.trim()
         return when {
             // It's a number
-            NumberUtils.isParsable(textValue) -> textValue
+            NumberUtils.isParsable(trimmedValue) -> trimmedValue
             // It's a boolean
-            BooleanUtils.toBooleanObject(textValue) != null -> textValue
+            BooleanUtils.toBooleanObject(trimmedValue) != null -> trimmedValue
+            // It's a secret
+            trimmedValue.startsWith("\${") && trimmedValue.endsWith("}") -> trimmedValue
+            // it's a time period (like '120 seconds')
+            isTimePeriod(trimmedValue) -> textValue
             // It's a String
             else -> {
-                var result = textValue
+                var result = trimmedValue
 
                 // wrap in quotes unless it's a list
                 if (!result.contains('[') && !result.startsWith('"') && !result.contains("]"))
@@ -183,6 +186,20 @@ object ConfGenerator {
                 result
             }
         }
+    }
+
+    private fun isTimePeriod(value: String): Boolean {
+        if (value.toLowerCase().endsWith("seconds")
+            || value.toLowerCase().endsWith("milliseconds")
+            || value.toLowerCase().endsWith("hours")
+            || value.toLowerCase().endsWith("days")
+            || value.toLowerCase().endsWith("months")
+            || value.toLowerCase().endsWith("years")
+            || value.toLowerCase().endsWith("minutes")) {
+            val tokens = value.split(" ")
+            if (NumberUtils.isParsable(tokens[0])) return true
+        }
+        return false
     }
 
 }

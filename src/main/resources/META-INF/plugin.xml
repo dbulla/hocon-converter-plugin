@@ -93,6 +93,10 @@ cors = [
 
     <change-notes><![CDATA[
 <ul>
+    <li><b>0.2.3 Feature</b> - Option to move top-level lists to the bottom of the output for clarity, secrets (like
+        <pre>${SOME_SECRET}</pre>
+        ) are no longer escaped with quotes
+    </li>
     <li><b>0.2.2 Feature</b> - optional flattened keys on map-style output.  Instead of this: <br>
         <pre>
 aaa {
