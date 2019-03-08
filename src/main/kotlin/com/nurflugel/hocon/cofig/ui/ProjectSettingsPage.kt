@@ -21,8 +21,8 @@ import javax.swing.JPanel
 class ProjectSettingsPage(private val propertiesComponent: PropertiesComponent) : SearchableConfigurable, Configurable.NoScroll {
     // these need to be vars so the Intellij GUI binder can handle them
     private var enablePluginInProjectCheckBox: JCheckBox? = null
-  private var flattenKeysCheckbox: JCheckBox? = null
-  private var putTopLevelListsAtBottomCheckbox: JCheckBox? = null
+    private var flattenKeysCheckbox: JCheckBox? = null
+    private var putTopLevelListsAtBottomCheckbox: JCheckBox? = null
 
     private var containingPanel: JPanel? = null
 
