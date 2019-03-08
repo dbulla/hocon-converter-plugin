@@ -165,7 +165,7 @@ object ConfGenerator {
     }
 
     /** If the value is a String, ensure it's wrapped in quotes.  Numbers or Booleans, however, are ok as-is */
-    internal fun writeValueMaybeQuotes(textValue: String): String {
+    fun writeValueMaybeQuotes(textValue: String): String {
         val trimmedValue = textValue.trim()
         return when {
             // It's a number
