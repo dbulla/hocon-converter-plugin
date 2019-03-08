@@ -63,7 +63,7 @@ object ConfGenerator {
                 is HoconList -> {
                     if (!putListsAtBottom || indentLevel != 0) {// output unless it's a top-level list, and we want those at the bottom
                         indentLevel = outputListLines(value, lines, whiteSpace, indentLevel, key)
-                    }
+                }
                 }
                 else -> {
                     outputPropertyLines(value, lines, whiteSpace, key)
